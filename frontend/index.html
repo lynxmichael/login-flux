@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en" class="notranslate" translate="no">
+<head>
+    <!--meta http-equiv="refresh" content="60"-->
+    <meta charset="utf-8">
+    <meta name="color-scheme" content="dark">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+    <meta name="google" content="notranslate">
+    <meta name="description" content="FLUX | Visualiser vos données du marché boursiers de la BRVM">
+    <meta property="og:description" content="FLUX | Visualiser vos données du marché boursiers de la BRVM">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link href="style.css" rel="stylesheet">
+    <link href="./stylees.css">
+    <title>FLUX | vos données du marché boursiers de la BRVM en temps réel</title>
+    <style>
+        /* Styles généraux */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        
+        .web {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        .log-1 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4a90e2;
+        }
+        
+        .grow {
+            flex-grow: 1;
+        }
+        
+        .MENU {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            border: 1px solid #333;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+        
+        /* Barre de recherche moderne */
+        .search-container {
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .search-input-container {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border-radius: 25px;
+            border: 1px solid #444;
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+        
+        .search-input-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            fill: #888;
+        }
+        
+        /* Toast */
+        .toast {
+            display: none;
+        }
+        
+        /* Table */
+        .scroll-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        .currency-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+        
+        .currency-table th, .currency-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+        
+        .currency-table th {
+            background-color: #1a1a1a;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        
+        .sortable {
+            cursor: pointer;
+        }
+        
+        .sortable div {
+            display: flex;
+            align-items: center;
+        }
+        
+        .sortable svg {
+            margin-right: 5px;
+        }
+        
+        .right {
+            text-align: right;
+        }
+        
+        .center {
+            text-align: center;
+        }
+        
+        .name-cell {
+            display: flex;
+            align-items: center;
+        }
+        
+        .button-favorite {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+            color: #666;
+        }
+        
+        .button-favorite:hover {
+            color: #ffc107;
+        }
+        
+        .currency-header {
+            display: flex;
+            align-items: center;
+        }
+        
+        .currency-header img {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+        
+        .ls-Noms {
+            color: #e0e0e0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .ls-Noms:hover {
+            color: #4a90e2;
+        }
+        
+        .icon-button {
+            display: inline-flex;
+            margin-right: 5px;
+        }
+        
+        /* Diapo pubs */
+        .diapo {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .reclam {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        
+        #commande {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+        }
+        
+        .btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0 5px;
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+        }
+        
+        /* Convertisseur */
+        .converter-section {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        
+        .converter-title {
+            margin-top: 0;
+            color: #4a90e2;
+            text-align: center;
+        }
+        
+        .converter-form {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .converter-input, .converter-select {
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+        }
+        
+        .converter-input {
+            width: 120px;
+        }
+        
+        .converter-select {
+            width: 200px;
+        }
+        
+        .equals-sign {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        /* Footer */
+        .footer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 40px 0;
+            margin-top: 50px;
+            border-top: 1px solid #333;
+            gap: 30px;
+        }
+        
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .footer-header {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4a90e2;
+            margin-bottom: 20px;
+        }
+        
+        .footer-logo {
+            max-width: 120px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+        
+        .footer-description {
+            line-height: 1.6;
+            color: #b0b0b0;
+        }
+        
+        .footer-links {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .footer-link {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background-color: #1e1e1e;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #e0e0e0;
+            transition: background-color 0.3s;
+        }
+        
+        .footer-link:hover {
+            background-color: #2d2d2d;
+        }
+        
+        .footer-link img {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 4px;
+        }
+        
+        .payment-methods {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .payment-method {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 40px;
+            background-color: #1e1e1e;
+            border-radius: 6px;
+            transition: transform 0.3s;
+        }
+        
+        .payment-method:hover {
+            transform: translateY(-3px);
+        }
+        
+        .payment-method img {
+            max-width: 80%;
+            max-height: 80%;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .converter-form {
+                flex-direction: column;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .header-settings {
+                margin-top: 15px;
+                width: 100%;
+            }
+            
+            .MENU {
+                width: 100%;
+            }
+            
+            .footer {
+                flex-direction: column;
+            }
+            
+            .footer-section {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<div id="app" class="web">
+    <header class="header">
+        <p>
+            <span class="log-1">FLUX.IO</span>
+        </p>
+        <div class="grow"></div>
+        <div class="header-settings">
+            <select class="MENU">
+                <option value="Agricultures">Choisir un marché</option>
+                <optgroup label="Liste">
+                    <option value="JSE">JSE</option>
+                    <option value="EGX">EGX</option>
+                    <option value="NGX">NGX</option>
+                    <option value="MASI">MASI</option>
+                    <option value="NSE">NSE</option>
+                    <option value="BRVM">BRVM</option>
+                </optgroup>
+            </select>
+        </div>
+    </header>
+
+    <main>
+        <!-- DIAPO POUR LES PUBS -->
+        <div class="diapo">
+            <img class="reclam" src="./IMAGE/pub (2).jpg" alt=""/>
+            <img class="reclam" src="./IMAGE/pub.jpg" alt=""/>
+            <img class="reclam" src="./IMAGE/pub 4.png" alt=""/> 
+            <img class="reclam" src="./IMAGE/pub 5.png" alt=""/>
+            <div id="commande">
+                <div class="btn" id="bt1"></div>
+                <div class="btn" id="bt2"></div>
+                <div class="btn" id="bt3"></div>
+                <div class="btn" id="bt4"></div>
+            </div>
+        </div>
+
+        <!-- Barre de recherche moderne -->
+        <p class="toast scroll-toast closed">
+            <svg width="24" height="24"></svg>
+            <span></span>
+            <svg width="24" height="24"></svg>
+        </p>
+        
+        <div class="search-container">
+            <div class="search-input-container">
+                <input data-table="" placeholder="Rechercher une action..." class="search-input" value="">
+                <svg width="24" height="24" class="search-input-icon">
+                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"></path>
+                </svg>
+            </div>
+        </div>
+
+        <div class="scroll-container">
+            <table class="currency-table">
+                <thead>
+                    <tr>
+                        <th class="sortable">
+                            <div>
+                                <svg width="24" height="24">
+                                    <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"></path>
+                                </svg>
+                                <span>#</span>
+                            </div>
+                        </th>
+                        <th class="sortable">
+                            <div>
+                                <svg width="24" height="24">
+                                    <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"></path>
+                                </svg>
+                                <span>Nom</span>
+                            </div>
+                        </th>
+                        <th class="sortable">
+                            <div>
+                                <svg width="24" height="24">
+                                    <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"></path>
+                                </svg>
+                                <span>Prix</span>
+                            </div>
+                        </th>
+                        <th class="sortable">
+                            <div>
+                                <svg width="24" height="24">
+                                    <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"></path>
+                                </svg>
+                                <span>Capitalisation</span>
+                            </div>
+                        </th>
+                        <th class="sortable">
+                            <div>
+                                <svg width="24" height="24">
+                                    <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"></path>
+                                </svg>
+                                <span>24h Volume</span>
+                            </div>
+                        </th>
+                        <th class="sortable">
+                            <div>
+                                <svg width="24" height="24">
+                                    <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"></path>
+                                </svg>
+                                <span>Heure</span>
+                            </div>
+                        </th>
+                        <th class="sortable">
+                            <div>
+                                <svg width="24" height="24">
+                                    <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"></path>
+                                </svg>
+                                <span>Jour</span>
+                            </div>
+                        </th>
+                        <th class="sortable">
+                            <div>
+                                <svg width="24" height="24">
+                                    <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"></path>
+                                </svg>
+                                <span>Semaine</span>
+                            </div>
+                        </th>
+                        <th class="sortable">
+                            <div>
+                                <svg width="24" height="24">
+                                    <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"></path>
+                                </svg>
+                                <span>Mois</span>
+                            </div>
+                        </th>
+                        <th class="sortable">
+                            <div>
+                                <svg width="24" height="24">
+                                    <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"></path>
+                                </svg>
+                                <span>Année</span>
+                            </div>
+                        </th>
+                        <th>Liens Sgi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                                                          <!-----------------------PARTIE TABLE DES ACTIONS--------------------------->
+                                                            
+                                                            <tbody>
+                                                              <tr>
+                                                                <td class="right">1</td><td><div class="name-cell"><button class="icon-button button-favorite" title=""><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                  
+                                                                  <div class="currency-header"><a class="ls-Noms" href="./abjc.html">
+                                                                  <img src="./IMAGE/sevair_Abidjan (2).png" alt="" title=""><span>Servair CI</span></a>
+                                                                </div></div></td><td class="right">23 403&nbsp;Fcfa</td><td class="right">447,58&nbsp;M&nbsp;Fcfa</td><td class="right volume">23,10&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center" style="background-color: rgb(34, 136, 34);">+0,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-3%</td><td class="center" style="background-color: rgb(34, 136, 34);">+6,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-52%</td><td>
+                                                                  
+                                                                  <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.jpeg" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+
+                                                                  <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac.jpeg" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                  <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.jpeg" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                </td></tr>
+
+
+                                                                <tr>
+                                                                  <td class="right">2</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                    
+                                                                    <div class="currency-header"><a class="ls-Noms" href="./bicc.html">
+                                                                    <img src="./IMAGE/bicici.jpg" alt="" title=""><span>Bici CI</span></a>
+                                                                  </div></div></td><td class="right">1 872&nbsp;Fcfa</td><td class="right">228,38&nbsp;M&nbsp;Fcfa</td><td class="right volume">14,60&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,2%</td><td class="center" style="background-color: rgb(34, 136, 34);">+2,1%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,9%</td><td class="center" style="background-color: rgb(34, 136, 34);">+21,2%</td><td class="center" style="background-color: rgb(187, 68, 68);">-41,3%</td><td>
+                                                                    
+                                                                    <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                    
+                                                                    <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                    <a href="#" titl="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                    
+                                                                   </td></tr>
+                                                                  
+                                                                  <tr>
+                                                                    <td class="right">3</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                      
+                                                                      <div class="currency-header"><a class="ls-Noms" href="./bnbc.html">
+                                                                        <img src="./IMAGE/bernabé.jpg" alt="" title=""><span>Bernabé CI</span></a>
+                                                                      </div></div></td><td class="right">1,000&nbsp;Fcfa</td><td class="right">67,55&nbsp;M&nbsp;Fcfa</td><td class="right volume">41,43&nbsp;M&nbsp;Fcfa</td><td class="center">0%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td>
+                                                                        <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                      
+                                                                      <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                      
+                                                                      <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                      
+                                                                    </td></tr>
+                                                                    <tr>
+                                                                      <td class="right">4</td><td><div class="name-cell"><button class="icon-button button-favorite" title=""><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                        
+                                                                        <div class="currency-header"><a class="ls-Noms" href="./boab.html">
+                                                                        <img src="./IMAGE/boa.jpg" alt="" title=""><span>Boa BN</span></a>
+                                                                      </div></div></td><td class="right">23 403&nbsp;Fcfa</td><td class="right">447,58&nbsp;M&nbsp;Fcfa</td><td class="right volume">23,10&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center" style="background-color: rgb(34, 136, 34);">+0,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-3%</td><td class="center" style="background-color: rgb(34, 136, 34);">+6,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-52%</td><td>
+                                                                        
+                                                                        <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+      
+                                                                        <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                        <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                      </td></tr>
+      
+      
+                                                                      <tr>
+                                                                        <td class="right">5</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                          
+                                                                          <div class="currency-header"><a class="ls-Noms" href="./boabf.html">
+                                                                          <img src="./IMAGE/boa.jpg" alt="" title=""><span>Boa BF</span></a>
+                                                                        </div></div></td><td class="right">1 872&nbsp;Fcfa</td><td class="right">228,38&nbsp;M&nbsp;Fcfa</td><td class="right volume">14,60&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,2%</td><td class="center" style="background-color: rgb(34, 136, 34);">+2,1%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,9%</td><td class="center" style="background-color: rgb(34, 136, 34);">+21,2%</td><td class="center" style="background-color: rgb(187, 68, 68);">-41,3%</td><td>
+                                                                          
+                                                                          <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                          
+                                                                          <a href="#" title="" class="icon-button " target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                          <a href="#" titl="" class="icon-button " target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                          
+                                                                          </td></tr>
+                                                                        
+                                                                        <tr>
+                                                                          <td class="right">6</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                            
+                                                                            <div class="currency-header"><a class="ls-Noms" href="./boac.html">
+                                                                              <img src="./IMAGE/boa.jpg" alt="Tether" title=""><span>Boa CI</span></a>
+                                                                            </div></div></td><td class="right">1,000&nbsp;Fcfa</td><td class="right">67,55&nbsp;M&nbsp;Fcfa</td><td class="right volume">41,43&nbsp;M&nbsp;Fcfa</td><td class="center">0%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td>
+                                                                              <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                            
+                                                                            <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                            
+                                                                            <a href="#" title="" class="icon-button " target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                            
+                                                                          </td></tr>
+                                                                          <tr>
+                                                                            <td class="right">7</td><td><div class="name-cell"><button class="icon-button button-favorite" title=""><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                              
+                                                                              <div class="currency-header"><a class="ls-Noms" href="./boam.html">
+                                                                              <img src="./IMAGE/boa.jpg" alt="" title=""><span>Boa ML</span></a>
+                                                                            </div></div></td><td class="right">23 403&nbsp;Fcfa</td><td class="right">447,58&nbsp;M&nbsp;Fcfa</td><td class="right volume">23,10&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center" style="background-color: rgb(34, 136, 34);">+0,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-3%</td><td class="center" style="background-color: rgb(34, 136, 34);">+6,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-52%</td><td>
+                                                                              
+                                                                              <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+            
+                                                                              <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                              <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                            </td></tr>
+            
+            
+                                                                            <tr>
+                                                                              <td class="right">8</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                
+                                                                                <div class="currency-header"><a class="ls-Noms" href="./boan.html">
+                                                                                <img src="./IMAGE/boa.jpg" alt="" title=""><span>Boa NG</span></a>
+                                                                              </div></div></td><td class="right">1 872&nbsp;Fcfa</td><td class="right">228,38&nbsp;M&nbsp;Fcfa</td><td class="right volume">14,60&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,2%</td><td class="center" style="background-color: rgb(34, 136, 34);">+2,1%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,9%</td><td class="center" style="background-color: rgb(34, 136, 34);">+21,2%</td><td class="center" style="background-color: rgb(187, 68, 68);">-41,3%</td><td>
+                                                                                
+                                                                                <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                
+                                                                                <a href="#" title="" class="icon-button " target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                <a href="#" titl="" class="icon-button " target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                
+                                                                               </td></tr>
+                                                                              
+                                                                              <tr>
+                                                                                <td class="right">9</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                  
+                                                                                  <div class="currency-header"><a class="ls-Noms" href="./boas.html">
+                                                                                    <img src="./IMAGE/boa.jpg" alt="Tether" title=""><span>Boa SN</span></a>
+                                                                                  </div></div></td><td class="right">1,000&nbsp;Fcfa</td><td class="right">67,55&nbsp;M&nbsp;Fcfa</td><td class="right volume">41,43&nbsp;M&nbsp;Fcfa</td><td class="center">0%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td>
+                                                                                    <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                  
+                                                                                  <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                  
+                                                                                  <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                  
+                                                                                </td></tr>
+                                                                                <tr>
+                                                                                  <td class="right">10</td><td><div class="name-cell"><button class="icon-button button-favorite" title=""><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                    
+                                                                                    <div class="currency-header"><a class="ls-Noms" href="./cabc.html">
+                                                                                    <img src="./IMAGE/sicable.jpg" alt="" title=""><span>Sicable CI</span></a>
+                                                                                  </div></div></td><td class="right">23 403&nbsp;Fcfa</td><td class="right">447,58&nbsp;M&nbsp;Fcfa</td><td class="right volume">23,10&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center" style="background-color: rgb(34, 136, 34);">+0,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-3%</td><td class="center" style="background-color: rgb(34, 136, 34);">+6,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-52%</td><td>
+                                                                                    
+                                                                                    <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                  
+                                                                                    <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                    <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                  </td></tr>
+                          
+                                                                                  <tr>
+                                                                                    <td class="right">11</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                      
+                                                                                      <div class="currency-header"><a class="ls-Noms" href="./cbibf.html">
+                                                                                        <img src="./IMAGE/coris bq.jpg" alt="" title=""><span>CB Int BF</span></a>
+                                                                                      </div></div></td><td class="right">1,000&nbsp;Fcfa</td><td class="right">67,55&nbsp;M&nbsp;Fcfa</td><td class="right volume">41,43&nbsp;M&nbsp;Fcfa</td><td class="center">0%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td>
+                                                                                        <a href="#" title="View Tether on CoinMarketCap" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                      
+                                                                                      <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                      
+                                                                                      <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                      
+                                                                                    </td></tr>
+
+                  
+                                                                                  <tr>
+                                                                                    <td class="right">12</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                      
+                                                                                      <div class="currency-header"><a class="ls-Noms" href="./cfac.html">
+                                                                                      <img src="./IMAGE/cfao.jpg" alt="" title=""><span>Cfao CI</span></a>
+                                                                                    </div></div></td><td class="right">1 872&nbsp;Fcfa</td><td class="right">228,38&nbsp;M&nbsp;Fcfa</td><td class="right volume">14,60&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,2%</td><td class="center" style="background-color: rgb(34, 136, 34);">+2,1%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,9%</td><td class="center" style="background-color: rgb(34, 136, 34);">+21,2%</td><td class="center" style="background-color: rgb(187, 68, 68);">-41,3%</td><td>
+                                                                                      
+                                                                                      <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                      
+                                                                                      <a href="#" title="" class="icon-button " target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                      <a href="#" titl="" class="icon-button " target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                      
+                                                                                     </td></tr>
+                                                                                    
+                                                                                    <tr>
+                                                                                      <td class="right">13</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                        
+                                                                                        <div class="currency-header"><a class="ls-Noms" href="./cie.html">
+                                                                                          <img src="./IMAGE/cie ci.png" alt="Tether" title=""><span>Cie CI</span></a>
+                                                                                        </div></div></td><td class="right">1,000&nbsp;Fcfa</td><td class="right">67,55&nbsp;M&nbsp;Fcfa</td><td class="right volume">41,43&nbsp;M&nbsp;Fcfa</td><td class="center">0%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td>
+                                                                                          <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                        
+                                                                                        <a href="#" title="" class="icon-button " target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                        
+                                                                                        <a href="#" title="" class="icon-button " target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                        
+                                                                                      </td></tr>
+                                                                                      <tr>
+                                                                                        <td class="right">14</td><td><div class="name-cell"><button class="icon-button button-favorite" title=""><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                          
+                                                                                          <div class="currency-header"><a class="ls-Noms" href="./ecoc.html">
+                                                                                          <img src="./IMAGE/ecobank.jpg" alt="" title=""><span>Ecobank CI</span></a>
+                                                                                        </div></div></td><td class="right">23 403&nbsp;Fcfa</td><td class="right">447,58&nbsp;M&nbsp;Fcfa</td><td class="right volume">23,10&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center" style="background-color: rgb(34, 136, 34);">+0,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-3%</td><td class="center" style="background-color: rgb(34, 136, 34);">+6,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-52%</td><td>
+                                                                                          
+                                                                                          <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                        
+                                                                                          <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                          <a href="#" title="" class="icon-button " target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                        </td></tr>
+                        
+                        
+                                                                                        <tr>
+                                                                                          <td class="right">15</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                            
+                                                                                            <div class="currency-header"><a class="ls-Noms" href="./etit.html">
+                                                                                            <img src="./IMAGE/etit.jpg" alt="" title=""><span>Ecobank TG</span></a>
+                                                                                          </div></div></td><td class="right">1 872&nbsp;Fcfa</td><td class="right">228,38&nbsp;M&nbsp;Fcfa</td><td class="right volume">14,60&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,2%</td><td class="center" style="background-color: rgb(34, 136, 34);">+2,1%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,9%</td><td class="center" style="background-color: rgb(34, 136, 34);">+21,2%</td><td class="center" style="background-color: rgb(187, 68, 68);">-41,3%</td><td>
+                                                                                            
+                                                                                            <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                            
+                                                                                            <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                            <a href="#" titl="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                            
+                                                                                           </td></tr>
+                                                                                          
+                                                                                          <tr>
+                                                                                            <td class="right">16</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                              
+                                                                                              <div class="currency-header"><a class="ls-Noms" href="./ftsc.html">
+                                                                                                <img src="./IMAGE/filtisac.jpg" alt="" title=""><span>	Filtisac CI</span></a>
+                                                                                              </div></div></td><td class="right">1,000&nbsp;Fcfa</td><td class="right">67,55&nbsp;M&nbsp;Fcfa</td><td class="right volume">41,43&nbsp;M&nbsp;Fcfa</td><td class="center">0%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td>
+                                                                                                <a href="#" title="View Tether on CoinMarketCap" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                              
+                                                                                              <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                              
+                                                                                              <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                              
+                                                                                            </td></tr>
+                                                                                            <tr>
+                                                                                              <td class="right">17</td><td><div class="name-cell"><button class="icon-button button-favorite" title=""><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                
+                                                                                                <div class="currency-header"><a class="ls-Noms" href="./neic.html">
+                                                                                                <img src="./IMAGE/nei-ceda.jpg" alt="" title=""><span>Nei-Ceda CI</span></a>
+                                                                                              </div></div></td><td class="right">23 403&nbsp;Fcfa</td><td class="right">447,58&nbsp;M&nbsp;Fcfa</td><td class="right volume">23,10&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center" style="background-color: rgb(34, 136, 34);">+0,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-3%</td><td class="center" style="background-color: rgb(34, 136, 34);">+6,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-52%</td><td>
+                                                                                                
+                                                                                                <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                              
+                                                                                                <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                              </td></tr>
+                              
+                              
+                                                                                              <tr>
+                                                                                                <td class="right">18</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                  
+                                                                                                  <div class="currency-header"><a class="ls-Noms" href="./nsbc.html">
+                                                                                                  <img src="./IMAGE/nsia.png" alt="" title=""><span>	Nsia Bk CI</span></a>
+                                                                                                </div></div></td><td class="right">1 872&nbsp;Fcfa</td><td class="right">228,38&nbsp;M&nbsp;Fcfa</td><td class="right volume">14,60&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,2%</td><td class="center" style="background-color: rgb(34, 136, 34);">+2,1%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,9%</td><td class="center" style="background-color: rgb(34, 136, 34);">+21,2%</td><td class="center" style="background-color: rgb(187, 68, 68);">-41,3%</td><td>
+                                                                                                  
+                                                                                                  <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                  
+                                                                                                  <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                  <a href="#" titl="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                  
+                                                                                                 </td></tr>
+                                                                                                
+                                                                                                <tr>
+                                                                                                  <td class="right">19</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                    
+                                                                                                    <div class="currency-header"><a class="ls-Noms" href="./ntlc.html">
+                                                                                                      <img src="./IMAGE/nestlé.jpg" alt="" title=""><span>Nestle CI</span></a>
+                                                                                                    </div></div></td><td class="right">1,000&nbsp;Fcfa</td><td class="right">67,55&nbsp;M&nbsp;Fcfa</td><td class="right volume">41,43&nbsp;M&nbsp;Fcfa</td><td class="center">0%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td>
+                                                                                                      <a href="#" title="View Tether on CoinMarketCap" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                    
+                                                                                                    <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                    
+                                                                                                    <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                    
+                                                                                                  </td></tr>
+                                                                                                  <tr>
+                                                                                                    <td class="right">20</td><td><div class="name-cell"><button class="icon-button button-favorite" title=""><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                      
+                                                                                                      <div class="currency-header"><a class="ls-Noms" href="./ontbf.html">
+                                                                                                      <img src="./IMAGE/onatel.png" alt="" title=""><span>Onatel BF</span></a>
+                                                                                                    </div></div></td><td class="right">23 403&nbsp;Fcfa</td><td class="right">447,58&nbsp;M&nbsp;Fcfa</td><td class="right volume">23,10&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center" style="background-color: rgb(34, 136, 34);">+0,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-3%</td><td class="center" style="background-color: rgb(34, 136, 34);">+6,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-52%</td><td>
+                                                                                                      
+                                                                                                      <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                    
+                                                                                                      <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                      <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                    </td></tr>
+                                    
+                                    
+                                                                                                    <tr>
+                                                                                                      <td class="right">21</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                        
+                                                                                                        <div class="currency-header"><a class="ls-Noms" href="./orgt.html">
+                                                                                                        <img src="./IMAGE/oragroup.jpg" alt="" title=""><span>Oragroup TG</span></a>
+                                                                                                      </div></div></td><td class="right">1 872&nbsp;Fcfa</td><td class="right">228,38&nbsp;M&nbsp;Fcfa</td><td class="right volume">14,60&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,2%</td><td class="center" style="background-color: rgb(34, 136, 34);">+2,1%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,9%</td><td class="center" style="background-color: rgb(34, 136, 34);">+21,2%</td><td class="center" style="background-color: rgb(187, 68, 68);">-41,3%</td><td>
+                                                                                                        
+                                                                                                        <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                        
+                                                                                                        <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                        <a href="#" titl="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                        
+                                                                                                       </td></tr>
+                                                                                                      
+                                                                                                      <tr>
+                                                                                                        <td class="right">22</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                          
+                                                                                                          <div class="currency-header"><a class="ls-Noms" href="./palc.html">
+                                                                                                            <img src="./IMAGE/parl.jpg" alt="" title=""><span>Parl CI</span></a>
+                                                                                                          </div></div></td><td class="right">1,000&nbsp;Fcfa</td><td class="right">67,55&nbsp;M&nbsp;Fcfa</td><td class="right volume">41,43&nbsp;M&nbsp;Fcfa</td><td class="center">0%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td>
+                                                                                                            <a href="#" title="View Tether on CoinMarketCap" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                          
+                                                                                                          <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                          
+                                                                                                          <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                          
+                                                                                                        </td></tr>
+                                                                                                        <tr>
+                                                                                                          <td class="right">23</td><td><div class="name-cell"><button class="icon-button button-favorite" title=""><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                            
+                                                                                                            <div class="currency-header"><a class="ls-Noms" href="./prsc.html">
+                                                                                                            <img src="./IMAGE/trac.jpg" alt="" title=""><span>Trac Motors CI</span></a>
+                                                                                                          </div></div></td><td class="right">23 403&nbsp;Fcfa</td><td class="right">447,58&nbsp;M&nbsp;Fcfa</td><td class="right volume">23,10&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center" style="background-color: rgb(34, 136, 34);">+0,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-3%</td><td class="center" style="background-color: rgb(34, 136, 34);">+6,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-52%</td><td>
+                                                                                                            
+                                                                                                            <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                          
+                                                                                                            <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                            <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                          </td></tr>
+                                          
+                                          
+                                                                                                          <tr>
+                                                                                                            <td class="right">24</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                              
+                                                                                                              <div class="currency-header"><a class="ls-Noms" href="./safc.html">
+                                                                                                              <img src="./IMAGE/saf.jpg" alt="" title=""><span>	Safca CI</span></a>
+                                                                                                            </div></div></td><td class="right">1 872&nbsp;Fcfa</td><td class="right">228,38&nbsp;M&nbsp;Fcfa</td><td class="right volume">14,60&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,2%</td><td class="center" style="background-color: rgb(34, 136, 34);">+2,1%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,9%</td><td class="center" style="background-color: rgb(34, 136, 34);">+21,2%</td><td class="center" style="background-color: rgb(187, 68, 68);">-41,3%</td><td>
+                                                                                                              
+                                                                                                              <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                              
+                                                                                                              <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                              <a href="#" titl="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                              
+                                                                                                             </td></tr>
+                                                                                                            
+                                                                                                            <tr>
+                                                                                                              <td class="right">25</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                
+                                                                                                                <div class="currency-header"><a class="ls-Noms" href="./scrc.html">
+                                                                                                                  <img src="./IMAGE/sucre.jpg" alt="" title=""><span>Sucrivoire CI</span></a>
+                                                                                                                </div></div></td><td class="right">1,000&nbsp;Fcfa</td><td class="right">67,55&nbsp;M&nbsp;Fcfa</td><td class="right volume">41,43&nbsp;M&nbsp;Fcfa</td><td class="center">0%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td>
+                                                                                                                  <a href="#" title="View Tether on CoinMarketCap" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                                
+                                                                                                                <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                                
+                                                                                                                <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                
+                                                                                                              </td></tr>
+                                                                                                              <tr>
+                                                                                                                <td class="right">26</td><td><div class="name-cell"><button class="icon-button button-favorite" title=""><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                  
+                                                                                                                  <div class="currency-header"><a class="ls-Noms" href="./sdcc.html">
+                                                                                                                  <img src="./IMAGE/sodeci.png" alt="" title=""><span>Sode CI</span></a>
+                                                                                                                </div></div></td><td class="right">23 403&nbsp;Fcfa</td><td class="right">447,58&nbsp;M&nbsp;Fcfa</td><td class="right volume">23,10&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center" style="background-color: rgb(34, 136, 34);">+0,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-3%</td><td class="center" style="background-color: rgb(34, 136, 34);">+6,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-52%</td><td>
+                                                                                                                  
+                                                                                                                  <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                
+                                                                                                                  <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                                  <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                </td></tr>
+                                                
+                                                
+                                                                                                                <tr>
+                                                                                                                  <td class="right">27</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                    
+                                                                                                                    <div class="currency-header"><a class="ls-Noms" href="./sdsc.html">
+                                                                                                                    <img src="./IMAGE/boloré.png" alt="" title=""><span>Bolloré Ci</span></a>
+                                                                                                                  </div></div></td><td class="right">1 872&nbsp;Fcfa</td><td class="right">228,38&nbsp;M&nbsp;Fcfa</td><td class="right volume">14,60&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,2%</td><td class="center" style="background-color: rgb(34, 136, 34);">+2,1%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,9%</td><td class="center" style="background-color: rgb(34, 136, 34);">+21,2%</td><td class="center" style="background-color: rgb(187, 68, 68);">-41,3%</td><td>
+                                                                                                                    
+                                                                                                                    <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                                    
+                                                                                                                    <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                    <a href="#" titl="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                    
+                                                                                                                   </td></tr>
+                                                                                                                  
+                                                                                                                  <tr>
+                                                                                                                    <td class="right">28</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                      
+                                                                                                                      <div class="currency-header"><a class="ls-Noms" href="./sem.html">
+                                                                                                                        <img src="./IMAGE/crown siem.jpg" alt="" title=""><span>Crown Siem CI</span></a>
+                                                                                                                      </div></div></td><td class="right">1,000&nbsp;Fcfa</td><td class="right">67,55&nbsp;M&nbsp;Fcfa</td><td class="right volume">41,43&nbsp;M&nbsp;Fcfa</td><td class="center">0%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td>
+                                                                                                                        <a href="#" title="View Tether on CoinMarketCap" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                                      
+                                                                                                                      <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                                      
+                                                                                                                      <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                      
+                                                                                                                    </td></tr>
+                                                                                                                    <tr>
+                                                                                                                      <td class="right">29</td><td><div class="name-cell"><button class="icon-button button-favorite" title=""><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                        
+                                                                                                                        <div class="currency-header"><a class="ls-Noms" href="./sgbc.html">
+                                                                                                                        <img src="./IMAGE/sg.jpg" alt="" title=""><span> Societé g CI</span></a>
+                                                                                                                      </div></div></td><td class="right">23 403&nbsp;Fcfa</td><td class="right">447,58&nbsp;M&nbsp;Fcfa</td><td class="right volume">23,10&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center" style="background-color: rgb(34, 136, 34);">+0,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-3%</td><td class="center" style="background-color: rgb(34, 136, 34);">+6,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-52%</td><td>
+                                                                                                                        
+                                                                                                                        <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                      
+                                                                                                                        <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                                        <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                      </td></tr>
+                                                      
+                                                      
+                                                                                                                      <tr>
+                                                                                                                        <td class="right">30</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                          
+                                                                                                                          <div class="currency-header"><a class="ls-Noms" href="./shec.html">
+                                                                                                                          <img src="./IMAGE/vivo.jpg" alt="" title=""><span>Vivo Energie CI</span></a>
+                                                                                                                        </div></div></td><td class="right">1 872&nbsp;Fcfa</td><td class="right">228,38&nbsp;M&nbsp;Fcfa</td><td class="right volume">14,60&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,2%</td><td class="center" style="background-color: rgb(34, 136, 34);">+2,1%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,9%</td><td class="center" style="background-color: rgb(34, 136, 34);">+21,2%</td><td class="center" style="background-color: rgb(187, 68, 68);">-41,3%</td><td>
+                                                                                                                          
+                                                                                                                          <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                                          
+                                                                                                                          <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                          <a href="#" titl="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                          
+                                                                                                                         </td></tr>
+                                                                                                                        
+                                                                                                                        <tr>
+                                                                                                                          <td class="right">31</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                            
+                                                                                                                            <div class="currency-header"><a class="ls-Noms" href="./sibc.html">
+                                                                                                                              <img src="./IMAGE/sib.png" alt="" title=""><span>Sib CI</span></a>
+                                                                                                                            </div></div></td><td class="right">1,000&nbsp;Fcfa</td><td class="right">67,55&nbsp;M&nbsp;Fcfa</td><td class="right volume">41,43&nbsp;M&nbsp;Fcfa</td><td class="center">0%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td>
+                                                                                                                              <a href="#" title="View Tether on CoinMarketCap" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                                            
+                                                                                                                            <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                                            
+                                                                                                                            <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                            
+                                                                                                                          </td></tr>
+                                                                                                                          <tr>
+                                                                                                                            <td class="right">32</td><td><div class="name-cell"><button class="icon-button button-favorite" title=""><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                              
+                                                                                                                              <div class="currency-header"><a class="ls-Noms" href="./sicc.html">
+                                                                                                                              <img src="./IMAGE/sicor.jpg" alt="" title=""><span>Sicor CI</span></a>
+                                                                                                                            </div></div></td><td class="right">23 403&nbsp;Fcfa</td><td class="right">447,58&nbsp;M&nbsp;Fcfa</td><td class="right volume">23,10&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center" style="background-color: rgb(34, 136, 34);">+0,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-3%</td><td class="center" style="background-color: rgb(34, 136, 34);">+6,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-52%</td><td>
+                                                                                                                              
+                                                                                                                              <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                            
+                                                                                                                              <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                                              <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                            </td></tr>
+                                                            
+                                                            
+                                                                                                                            <tr>
+                                                                                                                              <td class="right">33</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                                
+                                                                                                                                <div class="currency-header"><a class="ls-Noms" href="./sivc.html">
+                                                                                                                                <img src="./IMAGE/air.jpg" alt="" title=""><span>Air L. CI</span></a>
+                                                                                                                              </div></div></td><td class="right">1 872&nbsp;Fcfa</td><td class="right">228,38&nbsp;M&nbsp;Fcfa</td><td class="right volume">14,60&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,2%</td><td class="center" style="background-color: rgb(34, 136, 34);">+2,1%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,9%</td><td class="center" style="background-color: rgb(34, 136, 34);">+21,2%</td><td class="center" style="background-color: rgb(187, 68, 68);">-41,3%</td><td>
+                                                                                                                                
+                                                                                                                                <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                                                
+                                                                                                                                <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                <a href="#" titl="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                
+                                                                                                                               </td></tr>
+                                                                                                                              
+                                                                                                                              <tr>
+                                                                                                                                <td class="right">34</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                                  
+                                                                                                                                  <div class="currency-header"><a class="ls-Noms" href="./slbc.html">
+                                                                                                                                    <img src="./IMAGE/solibra.png" alt="" title=""><span>Solibra CI</span></a>
+                                                                                                                                  </div></div></td><td class="right">1,000&nbsp;Fcfa</td><td class="right">67,55&nbsp;M&nbsp;Fcfa</td><td class="right volume">41,43&nbsp;M&nbsp;Fcfa</td><td class="center">0%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td>
+                                                                                                                                    <a href="#" title="View Tether on CoinMarketCap" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                                                  
+                                                                                                                                  <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                                                  
+                                                                                                                                  <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                  
+                                                                                                                                </td></tr>
+                                                                                                                                <tr>
+                                                                                                                                  <td class="right">35</td><td><div class="name-cell"><button class="icon-button button-favorite" title=""><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                                    
+                                                                                                                                    <div class="currency-header"><a class="ls-Noms" href="./smbc.html">
+                                                                                                                                    <img src="./IMAGE/smb.png" alt="" title=""><span>Smb CI</span></a>
+                                                                                                                                  </div></div></td><td class="right">23 403&nbsp;Fcfa</td><td class="right">447,58&nbsp;M&nbsp;Fcfa</td><td class="right volume">23,10&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center" style="background-color: rgb(34, 136, 34);">+0,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-3%</td><td class="center" style="background-color: rgb(34, 136, 34);">+6,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-52%</td><td>
+                                                                                                                                    
+                                                                                                                                    <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                  
+                                                                                                                                    <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                                                    <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                  </td></tr>
+                                                                  
+                                                                  
+                                                                                                                                  <tr>
+                                                                                                                                    <td class="right">36</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                                      
+                                                                                                                                      <div class="currency-header"><a class="ls-Noms" href="./snts.html">
+                                                                                                                                      <img src="./IMAGE/sonatel.jpg" alt="" title=""><span>Sonatel SN</span></a>
+                                                                                                                                    </div></div></td><td class="right">1 872&nbsp;Fcfa</td><td class="right">228,38&nbsp;M&nbsp;Fcfa</td><td class="right volume">14,60&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,2%</td><td class="center" style="background-color: rgb(34, 136, 34);">+2,1%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,9%</td><td class="center" style="background-color: rgb(34, 136, 34);">+21,2%</td><td class="center" style="background-color: rgb(187, 68, 68);">-41,3%</td><td>
+                                                                                                                                      
+                                                                                                                                      <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                                                      
+                                                                                                                                      <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                      <a href="#" titl="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                      
+                                                                                                                                     </td></tr>
+                                                                                                                                    
+                                                                                                                                    <tr>
+                                                                                                                                      <td class="right">37</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                                        
+                                                                                                                                        <div class="currency-header"><a class="ls-Noms" href="./sogc.html">
+                                                                                                                                          <img src="./IMAGE/SOGB.png" alt="" title=""><span>Sogb CI</span></a>
+                                                                                                                                        </div></div></td><td class="right">1,000&nbsp;Fcfa</td><td class="right">67,55&nbsp;M&nbsp;Fcfa</td><td class="right volume">41,43&nbsp;M&nbsp;Fcfa</td><td class="center">0%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td>
+                                                                                                                                          <a href="#" title="View Tether on CoinMarketCap" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                                                        
+                                                                                                                                        <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                                                        
+                                                                                                                                        <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                        
+                                                                                                                                      </td></tr>
+                                                                                                                                      <tr>
+                                                                                                                                        <td class="right">38</td><td><div class="name-cell"><button class="icon-button button-favorite" title=""><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                                          
+                                                                                                                                          <div class="currency-header"><a class="ls-Noms" href="./sphc.html">
+                                                                                                                                          <img src="./IMAGE/saph.jpg" alt="" title=""><span>Saph CI</span></a>
+                                                                                                                                        </div></div></td><td class="right">23 403&nbsp;Fcfa</td><td class="right">447,58&nbsp;M&nbsp;Fcfa</td><td class="right volume">23,10&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center" style="background-color: rgb(34, 136, 34);">+0,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-3%</td><td class="center" style="background-color: rgb(34, 136, 34);">+6,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-52%</td><td>
+                                                                                                                                          
+                                                                                                                                          <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                        
+                                                                                                                                          <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                                                          <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                        </td></tr>
+                                                                        
+                                                                        
+                                                                                                                                        <tr>
+                                                                                                                                          <td class="right">39</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                                            
+                                                                                                                                            <div class="currency-header"><a class="ls-Noms" href="./stac.html">
+                                                                                                                                            <img src="./IMAGE/Setao.png" alt="" title=""><span>Setao ci</span></a>
+                                                                                                                                          </div></div></td><td class="right">1 872&nbsp;Fcfa</td><td class="right">228,38&nbsp;M&nbsp;Fcfa</td><td class="right volume">14,60&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,2%</td><td class="center" style="background-color: rgb(34, 136, 34);">+2,1%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,9%</td><td class="center" style="background-color: rgb(34, 136, 34);">+21,2%</td><td class="center" style="background-color: rgb(187, 68, 68);">-41,3%</td><td>
+                                                                                                                                            
+                                                                                                                                            <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                                                            
+                                                                                                                                            <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                            <a href="#" titl="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                            
+                                                                                                                                           </td></tr>
+                                                                                                                                          
+                                                                                                                                          <tr>
+                                                                                                                                            <td class="right">40</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                                              
+                                                                                                                                              <div class="currency-header"><a class="ls-Noms" href="./stbc.html">
+                                                                                                                                                <img src="./IMAGE/sitab.jpg" alt="" title=""><span>Sitab CI</span></a>
+                                                                                                                                              </div></div></td><td class="right">1,000&nbsp;Fcfa</td><td class="right">67,55&nbsp;M&nbsp;Fcfa</td><td class="right volume">41,43&nbsp;M&nbsp;Fcfa</td><td class="center">0%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td>
+                                                                                                                                                <a href="#" title="View Tether on CoinMarketCap" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                                                              
+                                                                                                                                              <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                                                              
+                                                                                                                                              <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                              
+                                                                                                                                            </td></tr>
+                                                                                                                                            <tr>
+                                                                                                                                              <td class="right">41</td><td><div class="name-cell"><button class="icon-button button-favorite" title=""><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                                                
+                                                                                                                                                <div class="currency-header"><a class="ls-Noms" href="./svoc.html">
+                                                                                                                                                <img src="./IMAGE/movis-ci.png" alt="" title=""><span>Movis CI</span></a>
+                                                                                                                                              </div></div></td><td class="right">23 403&nbsp;Fcfa</td><td class="right">447,58&nbsp;M&nbsp;Fcfa</td><td class="right volume">23,10&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center" style="background-color: rgb(34, 136, 34);">+0,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-3%</td><td class="center" style="background-color: rgb(34, 136, 34);">+6,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-52%</td><td>
+                                                                                                                                                
+                                                                                                                                                <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                              
+                                                                                                                                                <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                                                                <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                              </td></tr>
+                                                                              
+                                                                              
+                                                                                                                                              <tr>
+                                                                                                                                                <td class="right">42</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                                                  
+                                                                                                                                                  <div class="currency-header"><a class="ls-Noms" href="./ttlc.html">
+                                                                                                                                                  <img src="./IMAGE/total.jpg" alt="" title=""><span>Total CI</span></a>
+                                                                                                                                                </div></div></td><td class="right">1 872&nbsp;Fcfa</td><td class="right">228,38&nbsp;M&nbsp;Fcfa</td><td class="right volume">14,60&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,2%</td><td class="center" style="background-color: rgb(34, 136, 34);">+2,1%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,9%</td><td class="center" style="background-color: rgb(34, 136, 34);">+21,2%</td><td class="center" style="background-color: rgb(187, 68, 68);">-41,3%</td><td>
+                                                                                                                                                  
+                                                                                                                                                  <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                                                                  
+                                                                                                                                                  <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                                  <a href="#" titl="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                                  
+                                                                                                                                                 </td></tr>
+                                                                                                                                                
+                                                                                                                                                <tr>
+                                                                                                                                                  <td class="right">43</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                                                    
+                                                                                                                                                    <div class="currency-header"><a class="ls-Noms" href="./ttls.html">
+                                                                                                                                                      <img src="./IMAGE/total.jpg" alt="" title=""><span>Total SN</span></button>
+                                                                                                                                                    </div></div></td><td class="right">1,000&nbsp;Fcfa</td><td class="right">67,55&nbsp;M&nbsp;Fcfa</td><td class="right volume">41,43&nbsp;M&nbsp;Fcfa</td><td class="center">0%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td>
+                                                                                                                                                      <a href="#" title="View Tether on CoinMarketCap" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                                                                    
+                                                                                                                                                    <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                                                                    
+                                                                                                                                                    <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                                    
+                                                                                                                                                  </td></tr>
+                                                                                                                                                  <tr>
+                                                                                                                                                    <td class="right">44</td><td><div class="name-cell"><button class="icon-button button-favorite" title=""><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                                                      
+                                                                                                                                                      <div class="currency-header"><a class="ls-Noms" href="./ttrc.html">
+                                                                                                                                                      <img src="./IMAGE/brvm.png" alt="" title=""><span>Trituraf ste</span></a>
+                                                                                                                                                    </div></div></td><td class="right">23 403&nbsp;Fcfa</td><td class="right">447,58&nbsp;M&nbsp;Fcfa</td><td class="right volume">23,10&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center" style="background-color: rgb(34, 136, 34);">+0,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-3%</td><td class="center" style="background-color: rgb(34, 136, 34);">+6,3%</td><td class="center" style="background-color: rgb(187, 68, 68);">-52%</td><td>
+                                                                                                                                                      
+                                                                                                                                                      <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                    
+                                                                                                                                                      <a href="#" title="" class="icon-button " target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                                                                      <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                                    </td></tr>
+                                                                                    
+                                                                                    
+                                                                                                                                                    <tr>
+                                                                                                                                                      <td class="right">45</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                                                        
+                                                                                                                                                        <div class="currency-header"><a class="ls-Noms" href="./unlc.html">
+                                                                                                                                                        <img src="./IMAGE/unilever.png" alt="" title=""><span>Unilever CI</span></a>
+                                                                                                                                                      </div></div></td><td class="right">1 872&nbsp;Fcfa</td><td class="right">228,38&nbsp;M&nbsp;Fcfa</td><td class="right volume">14,60&nbsp;M&nbsp;Fcfa</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,2%</td><td class="center" style="background-color: rgb(34, 136, 34);">+2,1%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,9%</td><td class="center" style="background-color: rgb(34, 136, 34);">+21,2%</td><td class="center" style="background-color: rgb(187, 68, 68);">-41,3%</td><td>
+                                                                                                                                                        
+                                                                                                                                                        <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                                                                        
+                                                                                                                                                        <a href="#" title="" class="icon-button " target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                                        <a href="#" titl="" class="icon-button " target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                                        
+                                                                                                                                                       </td></tr>
+                                                                                                                                                      
+                                                                                                                                                      <tr>
+                                                                                                                                                        <td class="right">46</td><td><div class="name-cell"><button class="icon-button button-favorite" title="Ajouter aux favoris"><svg width="24" height="24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg></button>
+                                                                                                                                                          
+                                                                                                                                                          <div class="currency-header"><a class="ls-Noms" href="./unxc.html">
+                                                                                                                                                            <img src="./IMAGE/uniwax.png" alt="" title=""><span>Uniwax CI</span></a>
+                                                                                                                                                          </div></div></td><td class="right">1,000&nbsp;Fcfa</td><td class="right">67,55&nbsp;M&nbsp;Fcfa</td><td class="right volume">41,43&nbsp;M&nbsp;Fcfa</td><td class="center">0%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td class="center">0%</td><td class="center" style="background-color: rgb(187, 68, 68);">-0,1%</td><td>
+                                                                                                                                                            <a href="#" title="View Tether on CoinMarketCap" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24" viewBox="0 0 41 41"></svg></a>
+                                                                                                                                                          
+                                                                                                                                                          <a href="#" title="" class="icon-button" target="_blank" rel="noopener"><img src="./IMAGE/mac (2).png" width="24" height="24"><svg viewBox="0 0 2500 2500" width="24" height="24"></svg></a>
+                                                                                                                                                          
+                                                                                                                                                          <a href="#" title="" class="icon-button " target="_blank" rel="noopener"><img src="./IMAGE/bni.png" width="24" height="24"><svg width="24" height="24"></svg></a>
+                                                                                                                                                          
+                                                                                                                                                        </td></tr>
+                                                                                                                                                        
+
+
+
+                                                          </table></div>
+                                                        </tbody>
+
+                                                       <!-----------------------FIN PARTIE TABLE DES ACTIONS--------------------------->
+
+        <!-- Convertisseur d'actions -->
+        <section class="converter-section">
+            <h2 class="converter-title">Convertisseur d'Actions</h2>
+            <div class="converter-form">
+                <input type="number" class="converter-input" id="fromAmount" placeholder="Montant" min="0" step="0.01">
+                <select class="converter-select" id="fromStock">
+                    <option value="">Sélectionner une action...</option>
+                    <!-- Les options seront générées par JavaScript -->
+                </select>
+                <div class="equals-sign">=</div>
+                <input type="number" class="converter-input" id="toAmount" placeholder="Résultat" readonly>
+                <select class="converter-select" id="toStock">
+                    <option value="">Sélectionner une action...</option>
+                    <!-- Les options seront générées par JavaScript -->
+                </select>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer avec trois sections -->
+    <footer class="footer">
+        <!-- Section gauche -->
+        <div class="footer-section">
+            <img src="./IMAGE/LOGO (1).png" class="footer-logo" alt="FLUX.IO" title="FLUX.IO">
+            <div class="footer-description">
+                FLUX.IO - Plateforme boursière africaine de référence pour suivre les marchés financiers 
+                de la BRVM et d'autres places boursières africaines en temps réel.
+            </div>
+        </div>
+        
+        <!-- Section milieu -->
+        <div class="footer-section">
+            <div class="footer-header">Liens SGI</div>
+            <div class="footer-links">
+                <a href="#" class="footer-link">
+                    <img src="./IMAGE/bni.png" alt="BNI">
+                    <span>BNI</span>
+                </a>
+                <a href="#" class="footer-link">
+                    <img src="./IMAGE/sg.jpg" alt="SG">
+                    <span>Société Générale</span>
+                </a>
+                <a href="#" class="footer-link">
+                    <img src="./IMAGE/ecobank.jpg" alt="Ecobank">
+                    <span>Ecobank</span>
+                </a>
+                <a href="#" class="footer-link">
+                    <img src="./IMAGE/boa.jpg" alt="BOA">
+                    <span>Bank of Africa</span>
+                </a>
+                <a href="#" class="footer-link">
+                    <img src="./IMAGE/nsia.png" alt="NSIA">
+                    <span>NSIA Bank</span>
+                </a>
+                <a href="#" class="footer-link">
+                    <img src="./IMAGE/coris bq.jpg" alt="Coris">
+                    <span>Coris Bank</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Section droite -->
+        <div class="footer-section">
+            <div class="footer-header">Soutenir notre travail</div>
+            <div class="footer-description">
+                Votre soutien nous aide à maintenir et améliorer cette plateforme.
+                Faites un don via l'un de ces services:
+            </div>
+            <div class="payment-methods">
+                <div class="payment-method">
+                    <img src="./IMAGES/orange.jpg" alt="Orange Money">
+                </div>
+                <div class="payment-method">
+                    <img src="./IMAGES/mtn.jpg" alt="MTN MoMo">
+                </div>
+                <div class="payment-method">
+                    <img src="./IMAGES/wave.png" alt="Wave">
+                </div>
+                <div class="payment-method">
+                    <img src="./IMAGES/moov.png" alt="Moov Money">
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<noscript>Your browser does not support JavaScript or it's disabled</noscript>
+
+<script>
+    // Données des actions (exemple simplifié)
+    const stocksData = [
+        { name: "Servair CI", price: 23403, code: "SERV" },
+        { name: "Bici CI", price: 1872, code: "BICI" },
+        { name: "Bernabé CI", price: 1000, code: "BERN" },
+        { name: "Boa BN", price: 23403, code: "BOABN" },
+        { name: "Boa BF", price: 1872, code: "BOABF" },
+        { name: "Boa CI", price: 1000, code: "BOACI" },
+        // Ajouter toutes les autres actions ici...
+        { name: "Uniwax CI", price: 1000, code: "UNIW" }
+    ];
+
+    // Initialisation du convertisseur
+    document.addEventListener('DOMContentLoaded', function() {
+        const fromStockSelect = document.getElementById('fromStock');
+        const toStockSelect = document.getElementById('toStock');
+        const fromAmountInput = document.getElementById('fromAmount');
+        const toAmountInput = document.getElementById('toAmount');
+        
+        // Remplir les sélecteurs avec les données des actions
+        stocksData.forEach(stock => {
+            const option1 = document.createElement('option');
+            option1.value = stock.price;
+            option1.textContent = `${stock.name} (${stock.code})`;
+            
+            const option2 = document.createElement('option');
+            option2.value = stock.price;
+            option2.textContent = `${stock.name} (${stock.code})`;
+            
+            fromStockSelect.appendChild(option1);
+            toStockSelect.appendChild(option2);
+        });
+        
+        // Fonction de conversion
+        function convert() {
+            const fromPrice = parseFloat(fromStockSelect.value);
+            const toPrice = parseFloat(toStockSelect.value);
+            const amount = parseFloat(fromAmountInput.value);
+            
+            if (fromPrice && toPrice && amount) {
+                const result = (amount * fromPrice) / toPrice;
+                toAmountInput.value = result.toFixed(2);
+            } else {
+                toAmountInput.value = '';
+            }
+        }
+        
+        // Événements de changement
+        fromStockSelect.addEventListener('change', convert);
+        toStockSelect.addEventListener('change', convert);
+        fromAmountInput.addEventListener('input', convert);
+        
+        // Fonctionnalité de recherche
+        const searchInput = document.querySelector('.search-input');
+        const tableRows = document.querySelectorAll('.currency-table tbody tr');
+        
+        searchInput.addEventListener('input', function() {
+            const searchText = this.value.toLowerCase();
+            
+            tableRows.forEach(row => {
+                const nameCell = row.querySelector('.ls-Noms span');
+                if (nameCell) {
+                    const name = nameCell.textContent.toLowerCase();
+                    if (name.includes(searchText)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+        });
+        
+        // Fonctionnalité du diaporama
+        const slides = document.querySelectorAll('.reclam');
+        const buttons = document.querySelectorAll('.btn');
+        let currentSlide = 0;
+        
+        function showSlide(index) {
+            slides.forEach(slide => slide.style.opacity = 0);
+            buttons.forEach(btn => btn.style.backgroundColor = 'rgba(255, 255, 255, 0.5)');
+            
+            slides[index].style.opacity = 1;
+            buttons[index].style.backgroundColor = 'rgba(255, 255, 255, 1)';
+            
+            currentSlide = index;
+        }
+        
+        // Initialisation du diaporama
+        if (slides.length > 0) {
+            showSlide(0);
+            
+            // Configuration des boutons de contrôle
+            buttons.forEach((button, index) => {
+                button.addEventListener('click', () => showSlide(index));
+            });
+            
+            // Défilement automatique
+            setInterval(() => {
+                let nextSlide = (currentSlide + 1) % slides.length;
+                showSlide(nextSlide);
+            }, 5000);
+        }
+    });
+</script>
+</body>
+</html>

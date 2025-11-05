@@ -1,0 +1,2088 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trading Dashboard - FluxIO</title>
+  <script src="https:// cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f0f2f5;
+      color: #333;
+      line-height: 1.4;
+      font-size: 13px;
+      
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      padding-block: 10px;
+      border-bottom: 1px solid #ddd;
+      border-radius: 6px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      width: 85%;
+      margin: 0 auto;
+      padding-inline: 1%;
+      height: 56px;
+    }
+
+    header h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: bold;
+      color: #222;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 200px 1fr 240px;
+      gap: 12px;
+      padding-top: 12px;
+      width: 85%;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #fff;
+      padding: 12px;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      margin-bottom: 12px;
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #444;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #eee;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th, td {
+      padding: 6px;
+      text-align: right;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background: #f5f5f5;
+      font-weight: bold;
+      color: #333;
+      text-align: right;
+      font-size: 11px;
+    }
+
+    tr.sell td {
+      background: #ffeaea;
+      color: #b30000;
+    }
+
+    tr.buy td {
+      background: #e8f9e8;
+      color: #006600;
+    }
+
+    .variation-positive { 
+      color: #0da30d; 
+      font-weight: bold; 
+    }
+
+    .variation-negative { 
+      color: #e60000; 
+      font-weight: bold; 
+    }
+
+    .order-btn {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .order-btn button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-buy { background: #009933; color: #fff; }
+    .btn-sell { background: #cc0000; color: #fff; }
+
+    .btn-buy:hover { background: #007a29; }
+    .btn-sell:hover { background: #a80000; }
+
+    footer {
+      text-align: center;
+      padding: 12px;
+      margin-top: 15px;
+      font-size: 11px;
+      color: #666;
+      border-top: 1px solid #ddd;
+      background: #fff;
+    }
+    
+    .section__main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      height: 650px; /* Hauteur réduite */
+    }
+    
+    /* Section stats - CORRIGÉ */
+    .stat-card {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 6px 6px 0 0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      text-align: center;
+      margin-bottom: 0;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stat-title {
+      font-size: 0.85rem;
+      color: #555;
+      margin-bottom: 0.2rem;
+    }
+
+    .stat-value {
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    .stat-value.positive { color: green; }
+    .stat-value.negative { color: red; }
+
+    /* Zone historique */
+    .history table th {
+      text-align: center;
+    }
+    
+    .history td {
+      text-align: center;
+      font-size: 13px;
+    }
+    
+    .history tr td:first-child { color: green; }
+    .history tr td:last-child { color: #444; }
+    
+    /* Améliorations pour la partie droite */
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .right-column .card {
+      width: 100%;
+    }
+    
+    /* Barre de recherche */
+    .search-container {
+      position: relative;
+      margin-bottom: 10px;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 12px;
+      background: #f9f9f9;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: #ff6600;
+      box-shadow: 0 0 0 2px rgba(255,102,0,0.2);
+      background: #fff;
+    }
+    
+    /* Liens pour les actions */
+    .stock-link {
+      text-decoration: none;
+      color: #333;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+      border-radius: 3px;
+      transition: background 0.2s;
+    }
+    
+    .stock-link:hover {
+      background-color: #f0f8ff;
+    }
+    
+    .stock-symbol {
+      font-weight: none;
+      color: #0056b3;
+    }
+    
+    /* Graphique amélioré */
+    .chart-container {
+      position: relative;
+      height: 250px;
+      margin-top: 0;
+    }
+    
+    /* Scroll pour la liste des actions */
+    .scroll-container {
+      max-height: 280px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+    
+    .scroll-container table {
+      margin-bottom: 0;
+    }
+    
+    /* Indicateur de prix */
+    .price-indicator {
+      font-size: 18px;
+      font-weight: bold;
+      color: #ff6600;
+      text-align: center;
+      margin: 8px 0;
+      padding: 6px;
+      background: #fffaf0;
+      border-radius: 4px;
+      border: 1px solid #ffe0b2;
+    }
+    
+    /* Regroupement actions, historique et indices */
+    .combined-widget {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    /* Boutons de variation avec flèches */
+    .variation-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: bold;
+      min-width: 50px;
+    }
+    
+    .variation-btn.positive {
+      background-color: #e8f9e8;
+      color: #0da30d;
+    }
+    
+    .variation-btn.negative {
+      background-color: #ffeaea;
+      color: #e60000;
+    }
+    
+    .variation-btn::before {
+      margin-right: 3px;
+      font-size: 10px;
+    }
+    
+    .variation-btn.positive::before {
+      content: "▲";
+    }
+    
+    .variation-btn.negative::before {
+      content: "▼";
+    }
+    
+    /* NOUVEAU STYLE - Slider publicitaire */
+    .ad-slider {
+      margin-top: 15px;
+      position: relative;
+      border-radius: 6px;
+      height: 191px;
+      overflow: hidden;
+      border: 1px solid #eee;
+      background: #f9f9f9;
+
+    }
+    
+    .ad-slides {
+      display: flex;
+      width: 400%;
+      height: 100%;
+      animation: slide 20s infinite;
+    }
+    
+    .ad-slide {
+      width: 25%;
+      height: 100%;
+      flex-shrink: 0;
+    }
+    
+    .ad-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    @keyframes slide {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(0); }
+      25% { transform: translateX(-25%); }
+      45% { transform: translateX(-25%); }
+      50% { transform: translateX(-50%); }
+      70% { transform: translateX(-50%); }
+      75% { transform: translateX(-75%); }
+      95% { transform: translateX(-75%); }
+      100% { transform: translateX(0); }
+    }
+    
+    /* Contrôles du slider (optionnels) */
+    .ad-controls {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+    }
+    
+    .ad-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      cursor: pointer;
+    }
+    
+    .ad-dot.active {
+      background: white;
+    }
+    
+    /* Bouton de déconnexion */
+    .logout-btn {
+      background-color: #cc0000;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin-top: 10px;
+      width: 100%;
+    }
+    
+    .logout-btn:hover {
+      background-color: #a80000;
+    }
+    
+    /* Contrôles du graphique */
+    .chart-controls {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding: 0 5px;
+      flex-wrap: wrap;
+    }
+    
+    .timeframe-btn {
+      background-color: #f0f0f0;
+      border: 1px solid #ddd;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 11px;
+      transition: all 0.2s;
+      margin-bottom: 5px;
+    }
+    
+    .timeframe-btn.active {
+      background-color: #ff6600;
+      color: white;
+      border-color: #ff6600;
+    }
+    
+    .timeframe-btn:hover {
+      background-color: #e0e0e0;
+    }
+    
+    .timeframe-btn.active:hover {
+      background-color: #e55a00;
+    }
+    
+    /* Animation pour les variations de prix */
+    @keyframes priceChange {
+      0% { background-color: transparent; }
+      50% { background-color: rgba(0, 153, 51, 0.2); }
+      100% { background-color: transparent; }
+    }
+    
+    .price-update {
+      animation: priceChange 1s ease;
+    }
+    
+    /* Styles pour le modal - CORRIGÉ */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #999;
+      line-height: 1;
+    }
+
+    .close-modal:hover {
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #555;
+      font-size: 12px;
+    }
+
+    .form-group input, 
+    .form-group select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .form-group input:focus, 
+    .form-group select:focus {
+      outline: none;
+      border-color: #ff6600;
+      box-shadow: 0 0 0 2px rgba(255,102,0,0.2);
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .modal-buttons button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 12px;
+    }
+
+    .btn-cancel {
+      background-color: #f0f0f0;
+      color: #333;
+    }
+
+    .btn-cancel:hover {
+      background-color: #e0e0e0;
+    }
+
+    .btn-confirm-buy {
+      background-color: #009933;
+      color: white;
+    }
+
+    .btn-confirm-buy:hover {
+      background-color: #007a29;
+    }
+
+    .btn-confirm-sell {
+      background-color: #cc0000;
+      color: white;
+    }
+
+    .btn-confirm-sell:hover {
+      background-color: #a80000;
+    }
+    
+    /* Styles pour mobile */
+    @media (max-width: 992px) {
+      .container {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      
+      .right-column {
+        order: 3;
+      }
+      
+      .section__main {
+        height: auto;
+        order: 2;
+      }
+      
+      /* Masquer les statistiques sur mobile */
+      .stats-grid {
+        display: none;
+      }
+      
+      /* Ajuster la hauteur du graphique sur mobile */
+      .chart-container {
+        height: 300px;
+      }
+      
+      /* Ajuster le slider sur mobile */
+      .ad-slider {
+        height: 120px;
+      }
+      
+      /* Ajuster les contrôles du graphique pour mobile */
+      .chart-controls {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .chart-controls > div {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 5px;
+        width: 100%;
+        margin-bottom: 10px;
+      }
+      
+      .timeframe-btn {
+        flex: 1;
+        min-width: 50px;
+        text-align: center;
+      }
+      
+      #play-pause-btn {
+        width: 100%;
+        margin-top: 5px;
+      }
+      
+      /* Ajuster l'en-tête pour mobile */
+      header {
+        padding: 8px 12px;
+      }
+      
+      header h2 {
+        font-size: 14px;
+      }
+      
+      /* Ajuster les tables pour mobile */
+      table {
+        font-size: 11px;
+      }
+      
+      th, td {
+        padding: 4px;
+      }
+      
+      /* Ajuster les boutons d'achat/vente */
+      .order-btn {
+        flex-direction: column;
+      }
+      
+      .order-btn button {
+        width: 100%;
+        margin-bottom: 5px;
+      }
+      
+      /* Ajuster le modal pour mobile */
+      .modal-content {
+        margin: 10% auto;
+        width: 95%;
+        padding: 15px;
+      }
+    }
+    
+    /* Styles pour très petits écrans */
+    @media (max-width: 480px) {
+      .container {
+        padding: 8px;
+      }
+      
+      .card {
+        padding: 8px;
+      }
+      
+      .chart-container {
+        height: 250px;
+      }
+      
+      .price-indicator {
+        font-size: 16px;
+      }
+      
+      .ad-slider {
+        height: 100px;
+      }
+    }
+
+    /* NOUVEAUX STYLES POUR L'AUTHENTIFICATION */
+    
+    /* Boutons dans le header */
+    .auth-buttons {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .auth-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    
+    .btn-login {
+      background-color: #ff6600;
+      color: white;
+    }
+    
+    .btn-login:hover {
+      background-color: #e55a00;
+    }
+    
+    .btn-register {
+      background-color: #009933;
+      color: white;
+    }
+    
+    .btn-register:hover {
+      background-color: #007a29;
+    }
+    
+    .btn-profile {
+      background-color: #0056b3;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .btn-profile:hover {
+      background-color: #004494;
+    }
+    
+    /* Modals d'authentification */
+    .auth-modal {
+      display: none;
+      position: fixed;
+      z-index: 1001;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .auth-modal-content {
+      background-color: #fff;
+      margin: auto;
+      padding: 25px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      position: relative;
+    }
+
+    .auth-modal-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .auth-modal-header h3 {
+      margin: 0 0 10px 0;
+      color: #333;
+      font-size: 18px;
+    }
+
+    .auth-modal-header p {
+      margin: 0;
+      color: #666;
+      font-size: 13px;
+    }
+
+    .auth-form-group {
+      margin-bottom: 15px;
+    }
+
+    .auth-form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #555;
+      font-size: 12px;
+    }
+
+    .auth-form-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .auth-form-group input:focus {
+      outline: none;
+      border-color: #ff6600;
+      box-shadow: 0 0 0 2px rgba(255,102,0,0.2);
+    }
+
+    .auth-modal-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .auth-modal-btn {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 14px;
+      flex: 1;
+    }
+
+    .auth-btn-primary {
+      background-color: #ff6600;
+      color: white;
+    }
+
+    .auth-btn-primary:hover {
+      background-color: #e55a00;
+    }
+
+    .auth-btn-secondary {
+      background-color: #f0f0f0;
+      color: #333;
+    }
+
+    .auth-btn-secondary:hover {
+      background-color: #e0e0e0;
+    }
+
+    .auth-error {
+      color: #cc0000;
+      font-size: 12px;
+      margin-top: 5px;
+      display: none;
+    }
+
+    .auth-success {
+      color: #009933;
+      font-size: 12px;
+      margin-top: 5px;
+      display: none;
+    }
+
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+
+    .auth-tab.active {
+      border-bottom: 2px solid #ff6600;
+      color: #ff6600;
+      font-weight: bold;
+    }
+
+    .auth-tab-content {
+      display: none;
+    }
+
+    .auth-tab-content.active {
+      display: block;
+    }
+
+    /* Modal profil utilisateur */
+    .profile-modal {
+      display: none;
+      position: fixed;
+      z-index: 1001;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .profile-modal-content {
+      background-color: #fff;
+      margin: auto;
+      padding: 25px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 450px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      position: relative;
+    }
+
+    .profile-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-color: #ff6600;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: bold;
+      margin: 0 auto 15px;
+    }
+
+    .profile-info {
+      margin-bottom: 20px;
+    }
+
+    .profile-info-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .profile-info-label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .profile-info-value {
+      color: #333;
+    }
+
+    .profile-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .profile-stat {
+      text-align: center;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 6px;
+    }
+
+    .profile-stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ff6600;
+    }
+
+    .profile-stat-label {
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Modal d'authentification -->
+<div id="authModal" class="auth-modal">
+  <div class="auth-modal-content">
+    <div class="auth-modal-header">
+      <h3>Connexion à FluxIO</h3>
+      <p>Accédez à votre espace de trading</p>
+    </div>
+    
+    <div class="auth-tabs">
+      <div class="auth-tab active" data-tab="login">Connexion</div>
+      <div class="auth-tab" data-tab="register">Inscription</div>
+    </div>
+    
+    <!-- Formulaire de connexion -->
+    <div id="loginTab" class="auth-tab-content active">
+      <form id="loginForm">
+        <div class="auth-form-group">
+          <label for="loginEmail">Adresse email</label>
+          <input type="email" id="loginEmail" required placeholder="votre@email.com">
+        </div>
+        <div class="auth-form-group">
+          <label for="loginPassword">Mot de passe</label>
+          <input type="password" id="loginPassword" required placeholder="Votre mot de passe">
+        </div>
+        <div id="loginError" class="auth-error">
+          Identifiants incorrects. Veuillez réessayer.
+        </div>
+        <div class="auth-modal-buttons">
+          <button type="button" class="auth-modal-btn auth-btn-secondary" id="authCancel">Annuler</button>
+          <button type="submit" class="auth-modal-btn auth-btn-primary">Se connecter</button>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Formulaire d'inscription -->
+    <div id="registerTab" class="auth-tab-content">
+      <form id="registerForm">
+        <div class="auth-form-group">
+          <label for="registerName">Nom complet</label>
+          <input type="text" id="registerName" required placeholder="Votre nom complet">
+        </div>
+        <div class="auth-form-group">
+          <label for="registerEmail">Adresse email</label>
+          <input type="email" id="registerEmail" required placeholder="votre@email.com">
+        </div>
+        <div class="auth-form-group">
+          <label for="registerPassword">Mot de passe</label>
+          <input type="password" id="registerPassword" required placeholder="Créez un mot de passe">
+        </div>
+        <div class="auth-form-group">
+          <label for="registerConfirmPassword">Confirmer le mot de passe</label>
+          <input type="password" id="registerConfirmPassword" required placeholder="Confirmez votre mot de passe">
+        </div>
+        <div id="registerError" class="auth-error">
+          Erreur lors de l'inscription. Veuillez réessayer.
+        </div>
+        <div id="registerSuccess" class="auth-success">
+          Inscription réussie ! Vous pouvez maintenant vous connecter.
+        </div>
+        <div class="auth-modal-buttons">
+          <button type="button" class="auth-modal-btn auth-btn-secondary" id="registerCancel">Annuler</button>
+          <button type="submit" class="auth-modal-btn auth-btn-primary">S'inscrire</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal profil utilisateur -->
+<div id="profileModal" class="profile-modal">
+  <div class="profile-modal-content">
+    <div class="profile-header">
+      <div class="profile-avatar" id="profileAvatar">U</div>
+      <h3 id="profileName">Utilisateur</h3>
+      <p id="profileEmail">utilisateur@email.com</p>
+    </div>
+    
+    <div class="profile-info">
+      <div class="profile-info-item">
+        <span class="profile-info-label">Membre depuis</span>
+        <span class="profile-info-value" id="profileSince">2025</span>
+      </div>
+      <div class="profile-info-item">
+        <span class="profile-info-label">Portefeuille</span>
+        <span class="profile-info-value" id="profileWallet">0 FCFA</span>
+      </div>
+      <div class="profile-info-item">
+        <span class="profile-info-label">Dernière connexion</span>
+        <span class="profile-info-value" id="profileLastLogin">Aujourd'hui</span>
+      </div>
+    </div>
+    
+    <div class="profile-stats">
+      <div class="profile-stat">
+        <div class="profile-stat-value" id="profileTrades">0</div>
+        <div class="profile-stat-label">Transactions</div>
+      </div>
+      <div class="profile-stat">
+        <div class="profile-stat-value" id="profileProfit">0%</div>
+        <div class="profile-stat-label">Performance</div>
+      </div>
+    </div>
+    
+    <div class="auth-modal-buttons">
+      <button type="button" class="auth-modal-btn auth-btn-secondary" id="profileClose">Fermer</button>
+      <button type="button" class="auth-modal-btn auth-btn-primary" onclick="deconnexion()">Déconnexion</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <h2>SEMC - <span id="current-price">720</span> FCFA</h2>
+  <div class="auth-buttons">
+    <button class="auth-btn btn-register" id="btnRegister">S'inscrire</button>
+    <button class="auth-btn btn-login" id="btnLogin">Connexion</button>
+    <button class="auth-btn btn-profile" id="btnProfile" style="display: none;">
+      <span>Mon Profil</span>
+    </button>
+  </div>
+  <img src="IMAGES/FLUX.png" alt="Logo FluxIO" style="width: 8%;">
+</header>
+
+<div class="container">
+  <!-- Vendeurs & Acheteurs -->
+  <div class="card">
+    <h3>Vendeurs</h3>
+    <table id="sellers-table">
+      <tr><th>Prix</th><th>Volume</th><th>Total</th></tr>
+      <tr class="sell"><td>746</td><td>2,936</td><td>2,936</td></tr>
+      <tr class="sell"><td>745</td><td>1,287</td><td>4,223</td></tr>
+      <tr class="sell"><td>744</td><td>1,181</td><td>5,404</td></tr>
+      <tr class="sell"><td>743</td><td>1,016</td><td>6,420</td></tr>
+    </table>
+
+    <h3>Acheteurs</h3>
+    <table id="buyers-table">
+      <tr><th>Prix</th><th>Volume</th><th>Total</th></tr>
+      <tr class="buy"><td>728</td><td>1,874</td><td>1,874</td></tr>
+      <tr class="buy"><td>727</td><td>2,108</td><td>3,982</td></tr>
+      <tr class="buy"><td>726</td><td>1,455</td><td>5,437</td></tr>
+      <tr class="buy"><td>725</td><td>1,987</td><td>7,424</td></tr>
+    </table>
+    
+    <div class="price-indicator">
+      Écart: <span id="price-gap">18</span> FCFA
+    </div>
+  </div>
+  
+  <section class="section__main">
+    <!-- Section stats masquée sur mobile -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-item">
+          <div class="stat-title">Variation 24h</div>
+          <div class="stat-value positive" id="daily-change">+1,41%</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-title">24h Haut</div>
+          <div class="stat-value" id="daily-high">761</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-title">24h Bas</div>
+          <div class="stat-value" id="daily-low">721</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-title">Volume 24h</div>
+          <div class="stat-value" id="daily-volume">2.331</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Graphique avec slider publicitaire en dessous -->
+    <div class="card" style="border-radius: 0 0 6px 6px; margin-top: 0; padding-top: 10px;">
+      <h3 id="chart-title">1H - SEMC</h3> <!-- Titre modifié -->
+      
+      <!-- Contrôles du graphique améliorés avec plus d'options -->
+      <div class="chart-controls">
+        <div>
+          <button class="timeframe-btn active" data-timeframe="1h">1H</button>
+          <button class="timeframe-btn" data-timeframe="4h">4H</button>
+          <button class="timeframe-btn" data-timeframe="1d">1J</button>
+          <button class="timeframe-btn" data-timeframe="1w">1S</button>
+          <button class="timeframe-btn" data-timeframe="1m">1M</button>
+          <button class="timeframe-btn" data-timeframe="all">All</button>
+        </div>
+        <div>
+          <button id="play-pause-btn" class="timeframe-btn">⏸️ Pause</button>
+        </div>
+      </div>
+      
+      <div class="chart-container">
+        <canvas id="chart"></canvas>
+      </div>
+      <div class="order-btn">
+        <button class="btn-buy" id="btn-buy">Acheter</button>
+        <button class="btn-sell" id="btn-sell">Vendre</button>
+      </div>
+      
+      <!-- Slider publicitaire remplaçant le formulaire -->
+      <div class="ad-slider">
+        <div class="ad-slides">
+          <div class="ad-slide">
+            <img src="IMAGE/pub (2).jpg" alt="Publicité 1">
+          </div>
+          <div class="ad-slide">
+            <img src="IMAGE/pub.jpg" alt="Publicité 2">
+          </div>
+          <div class="ad-slide">
+            <img src="IMAGE/pub 4.png" alt="Publicité 3">
+          </div>
+          <div class="ad-slide">
+            <img src="IMAGE/pub 5.png" alt="Publicité 4">
+          </div>
+        </div>
+        <div class="ad-controls">
+          <div class="ad-dot active" data-slide="0"></div>
+          <div class="ad-dot" data-slide="1"></div>
+          <div class="ad-dot" data-slide="2"></div>
+          <div class="ad-dot" data-slide="3"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Colonne de droite avec tout regroupé -->
+  <div class="right-column">
+    <div class="card combined-widget">
+      <!-- Barre de recherche -->
+      <div class="search-container">
+        <input type="text" id="stockSearch" class="search-input" placeholder="Rechercher une action...">
+      </div>
+      
+      <!-- Liste des actions avec défilement -->
+      <div class="scroll-container">
+        <table id="stocksTable">
+          <tr><th>Symbole</th><th>Prix</th><th>Variation</th></tr>
+          <tr>
+            <td><a href="#" class="stock-link"><span class="stock-symbol">ABJC</span></a></td>
+            <td>1 600</td>
+            <td><span class="variation-btn positive">+0.06%</span></td>
+          </tr>
+          <tr>
+            <td><a href="#" class="stock-link"><span class="stock-symbol">BICC</span></a></td>
+            <td>6 600</td>
+            <td><span class="variation-btn positive">+1.54%</span></td>
+          </tr>
+          <tr>
+            <td><a href="#" class="stock-link"><span class="stock-symbol">BNBC</span></a></td>
+            <td>6 100</td>
+            <td><span class="variation-btn negative">-0.23%</span></td>
+          </tr>
+          <tr>
+            <td><a href="#" class="stock-link"><span class="stock-symbol">BOAB</span></a></td>
+            <td>6 110</td>
+            <td><span class="variation-btn positive">+0.12%</span></td>
+          </tr>
+          <tr>
+            <td><a href="#" class="stock-link"><span class="stock-symbol">BOABF</span></a></td>
+            <td>5 395</td>
+            <td><span class="variation-btn positive">+0.87%</span></td>
+          </tr>
+          <tr>
+            <td><a href="#" class="stock-link"><span class="stock-symbol">BOAC</span></a></td>
+            <td>4 310</td>
+            <td><span class="variation-btn negative">-0.79%</span></td>
+          </tr>
+          <tr>
+            <td><a href="#" class="stock-link"><span class="stock-symbol">BOAN</span></a></td>
+            <td>2 550</td>
+            <td><span class="variation-btn positive">+0.20%</span></td>
+          </tr>
+          <tr>
+            <td><a href="#" class="stock-link"><span class="stock-symbol">DAS</span></a></td>
+            <td>2 420</td>
+            <td><span class="variation-btn negative">-0.79%</span></td>
+          </tr>
+          <tr>
+            <td><a href="#" class="stock-link"><span class="stock-symbol">CABC</span></a></td>
+            <td>1 095</td>
+            <td><span class="variation-btn negative">-5.73%</span></td>
+          </tr>
+          <tr>
+            <td><a href="#" class="stock-link"><span class="stock-symbol">ETIT</span></a></td>
+            <td>3 250</td>
+            <td><span class="variation-btn positive">+1.25%</span></td>
+          </tr>
+          <tr>
+            <td><a href="#" class="stock-link"><span class="stock-symbol">FTSC</span></a></td>
+            <td>4 100</td>
+            <td><span class="variation-btn negative">-0.50%</span></td>
+          </tr>
+          <tr>
+            <td><a href="#" class="stock-link"><span class="stock-symbol">NEIC</span></a></td>
+            <td>2 800</td>
+            <td><span class="variation-btn positive">+0.90%</span></td>
+          </tr>
+        </table>
+      </div>
+      
+      <!-- Historique -->
+      <div style="display: grid;">
+        <div class="history">
+          <h3>Historique des dernières transactions</h3>
+          <table id="transaction-history">
+            <tr><th>Prix</th><th>Heure</th> <th>Qté</th></tr>
+            <tr><td>728</td><td>12:51:41</td><td>4</td></tr>
+            <tr><td>727</td><td>12:52:46</td><td>6</td></tr>
+            <tr><td>725</td><td>12:53:10</td><td>11</td></tr>
+            <tr><td>726</td><td>12:54:59</td><td>54</td></tr>
+            <tr><td>728</td><td>12:56:32</td><td>2</td></tr>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Bouton de déconnexion ajouté -->
+      <button class="logout-btn" onclick="deconnexion()">Déconnexion</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour les ordres d'achat/vente -->
+<div id="orderModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modal-title">Passer un ordre</h3>
+      <button class="close-modal">&times;</button>
+    </div>
+    <form id="orderForm">
+      <div class="form-group">
+        <label for="recipient">Destinataire</label>
+        <input type="text" id="recipient" required>
+      </div>
+      <div class="form-group">
+        <label for="orderType">Type d'ordre</label>
+        <select id="orderType" required>
+          <option value="buy">Achat</option>
+          <option value="sell">Vente</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="stockName">Nom de l'action</label>
+        <input type="text" id="stockName" value="SEMC" readonly>
+      </div>
+      <div class="form-group">
+        <label for="quantity">Quantité</label>
+        <input type="number" id="quantity" min="1" required>
+      </div>
+      <div class="form-group">
+        <label for="price">Prix (FCFA)</label>
+        <input type="number" id="price" step="0.01" required>
+      </div>
+      <div class="form-group">
+        <label for="validityDate">Date de validité</label>
+        <input type="date" id="validityDate" required>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn-cancel">Annuler</button>
+        <button type="submit" id="confirmOrder" class="btn-confirm-buy">Confirmer l'ordre</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<footer>
+  FluxIO © 2025 - Interface de démonstration
+</footer>
+
+<script>
+  // Variables globales pour l'authentification
+  let isAuthenticated = false;
+  let currentUser = null;
+  let pendingAction = null;
+
+  // Initialisation de l'authentification
+  function initAuth() {
+    const authModal = document.getElementById('authModal');
+    const profileModal = document.getElementById('profileModal');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const authTabs = document.querySelectorAll('.auth-tab');
+    const authCancel = document.getElementById('authCancel');
+    const registerCancel = document.getElementById('registerCancel');
+    const profileClose = document.getElementById('profileClose');
+    
+    // Boutons du header
+    document.getElementById('btnLogin').addEventListener('click', openAuthModal);
+    document.getElementById('btnRegister').addEventListener('click', openRegisterModal);
+    document.getElementById('btnProfile').addEventListener('click', openProfileModal);
+    
+    // Navigation des onglets
+    authTabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        const tabName = this.getAttribute('data-tab');
+        switchTab(tabName);
+      });
+    });
+    
+    // Formulaire de connexion
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      
+      if (authenticateUser(email, password)) {
+        closeAuthModal();
+        updateUIAfterLogin();
+        if (pendingAction) {
+          pendingAction();
+          pendingAction = null;
+        }
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+      }
+    });
+    
+    // Formulaire d'inscription
+    registerForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('registerName').value;
+      const email = document.getElementById('registerEmail').value;
+      const password = document.getElementById('registerPassword').value;
+      const confirmPassword = document.getElementById('registerConfirmPassword').value;
+      
+      if (password !== confirmPassword) {
+        document.getElementById('registerError').textContent = 'Les mots de passe ne correspondent pas';
+        document.getElementById('registerError').style.display = 'block';
+        return;
+      }
+      
+      if (registerUser(name, email, password)) {
+        document.getElementById('registerSuccess').style.display = 'block';
+        document.getElementById('registerError').style.display = 'none';
+        setTimeout(() => {
+          closeAuthModal();
+          switchTab('login');
+          document.getElementById('loginEmail').value = email;
+        }, 1500);
+      } else {
+        document.getElementById('registerError').textContent = 'Erreur lors de l\'inscription';
+        document.getElementById('registerError').style.display = 'block';
+      }
+    });
+    
+    // Fermeture des modals
+    authCancel.addEventListener('click', closeAuthModal);
+    registerCancel.addEventListener('click', closeAuthModal);
+    profileClose.addEventListener('click', closeProfileModal);
+    
+    // Fermer en cliquant à l'extérieur
+    window.addEventListener('click', function(e) {
+      if (e.target === authModal) closeAuthModal();
+      if (e.target === profileModal) closeProfileModal();
+    });
+  }
+  
+  // Fonctions d'authentification
+  function openAuthModal() {
+    document.getElementById('authModal').style.display = 'flex';
+    switchTab('login');
+    document.getElementById('loginError').style.display = 'none';
+  }
+  
+  function openRegisterModal() {
+    document.getElementById('authModal').style.display = 'flex';
+    switchTab('register');
+    document.getElementById('registerError').style.display = 'none';
+    document.getElementById('registerSuccess').style.display = 'none';
+  }
+  
+  function openProfileModal() {
+    if (currentUser) {
+      document.getElementById('profileName').textContent = currentUser.name;
+      document.getElementById('profileEmail').textContent = currentUser.email;
+      document.getElementById('profileAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+      document.getElementById('profileSince').textContent = currentUser.joinDate;
+      document.getElementById('profileWallet').textContent = currentUser.wallet + ' FCFA';
+      document.getElementById('profileTrades').textContent = currentUser.trades;
+      document.getElementById('profileProfit').textContent = currentUser.profit + '%';
+      document.getElementById('profileLastLogin').textContent = 'Aujourd\'hui';
+    }
+    document.getElementById('profileModal').style.display = 'flex';
+  }
+  
+  function closeAuthModal() {
+    document.getElementById('authModal').style.display = 'none';
+    document.getElementById('loginForm').reset();
+    document.getElementById('registerForm').reset();
+  }
+  
+  function closeProfileModal() {
+    document.getElementById('profileModal').style.display = 'none';
+  }
+  
+  function switchTab(tabName) {
+    document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.auth-tab-content').forEach(content => content.classList.remove('active'));
+    
+    document.querySelector(`.auth-tab[data-tab="${tabName}"]`).classList.add('active');
+    document.getElementById(tabName + 'Tab').classList.add('active');
+  }
+  
+  function authenticateUser(email, password) {
+    // Simulation d'authentification
+    if (email === 'demo@fluxio.com' && password === 'demo123') {
+      currentUser = {
+        name: 'Utilisateur Demo',
+        email: email,
+        joinDate: 'Jan 2025',
+        wallet: '1,250,000',
+        trades: 42,
+        profit: '+12.5'
+      };
+      isAuthenticated = true;
+      return true;
+    }
+    return false;
+  }
+  
+  function registerUser(name, email, password) {
+    // Simulation d'inscription
+    currentUser = {
+      name: name,
+      email: email,
+      joinDate: new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long' }),
+      wallet: '0',
+      trades: 0,
+      profit: '0'
+    };
+    return true;
+  }
+  
+  function updateUIAfterLogin() {
+    document.getElementById('btnLogin').style.display = 'none';
+    document.getElementById('btnRegister').style.display = 'none';
+    document.getElementById('btnProfile').style.display = 'flex';
+  }
+  
+  function updateUIAfterLogout() {
+    document.getElementById('btnLogin').style.display = 'block';
+    document.getElementById('btnRegister').style.display = 'block';
+    document.getElementById('btnProfile').style.display = 'none';
+    currentUser = null;
+    isAuthenticated = false;
+  }
+
+  // VOTRE CODE EXISTANT (inchangé)
+  // Plugin pour ajouter un filigrane (watermark) au graphique
+  const watermarkPlugin = {
+    id: 'watermark',
+    beforeDraw: (chart) => {
+      const ctx = chart.ctx;
+      const chartArea = chart.chartArea;
+      
+      // Créer une image pour le logo
+      const watermark = new Image();
+      watermark.src = 'IMAGES/FLUX.png'; // Chemin vers votre logo
+      
+      // Attendre que l'image soit chargée
+      if (watermark.complete) {
+        drawWatermark();
+      } else {
+        watermark.onload = drawWatermark;
+      }
+      
+      function drawWatermark() {
+        // Dimensions de l'image et du graphique
+        const imgWidth = watermark.width * 0.25; // Réduire la taille de l'image
+        const imgHeight = watermark.height * 0.25;
+        const chartWidth = chartArea.right - chartArea.left;
+        const chartHeight = chartArea.bottom - chartArea.top;
+        
+        // Positionner l'image au centre du graphique
+        const x = chartArea.left + chartWidth / 2 - imgWidth / 2;
+        const y = chartArea.top + chartHeight / 2 - imgHeight / 2;
+        
+        // Sauvegarder l'état du contexte
+        ctx.save();
+        
+        // Appliquer un flou à l'image
+        ctx.filter = 'blur(7px) opacity(0.6)'; // Flou de 5px et opacité réduite à 30%
+        
+        // Dessiner l'image
+        ctx.drawImage(watermark, x, y, imgWidth, imgHeight);
+        
+        // Restaurer l'état du contexte
+        ctx.restore();
+      }
+    }
+  };
+
+  // Variables globales
+  let chart;
+  let isPlaying = true;
+  let updateInterval;
+  let currentTimeframe = '1h'; // Période par défaut
+  let currentOrderType = 'buy'; // Type d'ordre par défaut
+  
+  // Données pour différentes périodes (avec données dynamiques pour 1H)
+  const timeframeData = {
+    '1h': {
+      data: [710, 740, 761, 720, 730, 728, 725],
+      labels: ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"],
+      dynamic: true // Indique que ces données peuvent être mises à jour
+    },
+    '4h': {
+      data: [700, 710, 750, 740, 730, 735, 728, 725, 720, 722, 725, 728],
+      labels: ["06:00", "08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00", "22:00", "00:00", "02:00", "04:00"],
+      dynamic: false
+    },
+    '1d': {
+      data: [710, 715, 720, 725, 730, 735, 740, 745, 750, 755, 760, 761, 758, 755, 752, 748, 745, 742, 738, 735, 732, 728, 725, 722],
+      labels: ["00:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"],
+      dynamic: false
+    },
+    '1w': {
+      data: [710, 720, 715, 730, 725, 740, 735],
+      labels: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
+      dynamic: false
+    },
+    '1m': {
+      data: [700, 710, 720, 730, 740, 750, 760, 761, 758, 755, 750, 745, 740, 735, 730, 728, 725, 722, 720, 718, 715, 712, 710, 708, 705, 702, 700, 705],
+      labels: ["J1", "J2", "J3", "J4", "J5", "J6", "J7", "J8", "J9", "J10", "J11", "J12", "J13", "J14", "J15", "J16", "J17", "J18", "J19", "J20", "J21", "J22", "J23", "J24", "J25", "J26", "J27", "J28"],
+      dynamic: false
+    },
+    'all': {
+      data: [650, 660, 670, 680, 690, 700, 710, 720, 730, 740, 750, 760],
+      labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"],
+      dynamic: false
+    }
+  };
+
+  // Initialisation du graphique
+  function initChart() {
+    // Enregistrer le plugin de watermark
+    Chart.register(watermarkPlugin);
+    
+    const ctx = document.getElementById('chart').getContext('2d');
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: timeframeData[currentTimeframe].labels,
+        datasets: [{
+          label: "Cours SEMC",
+          data: timeframeData[currentTimeframe].data,
+          borderColor: "#ff6600",
+          backgroundColor: "rgba(255,102,0,0.1)",
+          fill: true,
+          tension: 0,
+          pointBackgroundColor: "#ff6600",
+         pointRadius: 3,
+          pointHoverRadius: 5,
+          pointBorderWidth: 1,
+          pointBorderColor: "#fff"
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: {
+          duration: 1000,
+          easing: 'easeOutQuart'
+        },
+        plugins: { 
+          legend: { 
+            display: false 
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            titleFont: { size: 12 },
+            bodyFont: { size: 12 },
+            padding: 10
+          }
+        },
+        scales: {
+          x: { 
+            display: true,
+            grid: {
+              display: false
+            },
+            ticks: {
+              font: {
+                size: 10
+              }
+            }
+          },
+          y: { 
+            display: true,
+            grid: {
+              color: 'rgba(0,0,0,0.05)'
+            },
+            ticks: {
+              font: {
+                size: 10
+              },
+              callback: function(value) {
+                return value + ' FCFA';
+              }
+            }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'nearest'
+        },
+        elements: {
+          line: {
+            borderWidth: 2
+          }
+        }
+      },
+      plugins: [watermarkPlugin]
+    });
+    
+    // Démarrer les mises à jour automatiques pour 1H
+    startAutoUpdate();
+    
+    // Initialiser le slider publicitaire
+    initAdSlider();
+    
+    // Initialiser le modal
+    initOrderModal();
+  }
+  
+  // Initialisation du slider publicitaire
+  function initAdSlider() {
+    const dots = document.querySelectorAll('.ad-dot');
+    const slides = document.querySelector('.ad-slides');
+    
+    // Mettre à jour les points de contrôle en fonction de l'animation
+    setInterval(() => {
+      const transform = slides.style.transform || 'translateX(0)';
+      let currentSlide = 0;
+      
+      if (transform.includes('-25%')) currentSlide = 1;
+      else if (transform.includes('-50%')) currentSlide = 2;
+      else if (transform.includes('-75%')) currentSlide = 3;
+      
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentSlide);
+      });
+    }, 100);
+    
+    // Ajouter des événements de clic sur les points
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        const translateX = -index * 25;
+        slides.style.animation = 'none';
+        slides.style.transform = `translateX(${translateX}%)`;
+        
+        dots.forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+        
+        // Redémarrer l'animation après un délai
+        setTimeout(() => {
+          slides.style.animation = '';
+        }, 50);
+      });
+    });
+  }
+  
+
+  // Initialisation du modal d'ordre - CORRIGÉ
+  function initOrderModal() {
+    const modal = document.getElementById('orderModal');
+    const closeBtn = document.querySelector('.close-modal');
+    const cancelBtn = document.querySelector('.btn-cancel');
+    const orderForm = document.getElementById('orderForm');
+    
+    // Ouvrir le modal pour achat
+    document.getElementById('btn-buy').addEventListener('click', function() {
+      if (!isAuthenticated) {
+        pendingAction = function() {
+          currentOrderType = 'buy';
+          openOrderModal('Achat');
+        };
+        openAuthModal();
+      } else {
+        currentOrderType = 'buy';
+        openOrderModal('Achat');
+      }
+    });
+    
+    // Ouvrir le modal pour vente
+    document.getElementById('btn-sell').addEventListener('click', function() {
+      if (!isAuthenticated) {
+        pendingAction = function() {
+          currentOrderType = 'sell';
+          openOrderModal('Vente');
+        };
+        openAuthModal();
+      } else {
+        currentOrderType = 'sell';
+        openOrderModal('Vente');
+      }
+    });
+    
+    // Fermer le modal
+    function closeModal() {
+      modal.style.display = 'none';
+    }
+    
+    // Ouvrir le modal
+    function openOrderModal(type) {
+      // Mettre à jour le titre du modal
+      document.getElementById('modal-title').textContent = `Ordre d'${type.toLowerCase()} `;
+      
+      // Pré-remplir les champs
+      document.getElementById('orderType').value = currentOrderType;
+      document.getElementById('price').value = document.getElementById('current-price').textContent;
+      
+      // Définir la date de validité par défaut (aujourd'hui + 7 jours)
+      const today = new Date();
+      const validityDate = new Date(today);
+      validityDate.setDate(today.getDate() + 7);
+      document.getElementById('validityDate').value = validityDate.toISOString().split('T')[0];
+      
+      // Mettre à jour le bouton de confirmation
+      const confirmBtn = document.getElementById('confirmOrder');
+      confirmBtn.textContent = `Confirmer l'${type.toLowerCase()}`;
+      confirmBtn.className = currentOrderType === 'buy' ? 'btn-confirm-buy' : 'btn-confirm-sell';
+      
+      // Afficher le modal
+      modal.style.display = 'flex';
+    }
+    
+    // Événements pour fermer le modal
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+    
+    // Fermer le modal en cliquant à l'extérieur
+    window.addEventListener('click', function(event) {
+      if (event.target === modal) {
+        closeModal();
+      }
+    });
+    
+    // Gérer la soumission du formulaire
+    orderForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Récupérer les données du formulaire
+      const formData = {
+        recipient: document.getElementById('recipient').value,
+        orderType: document.getElementById('orderType').value,
+        stockName: document.getElementById('stockName').value,
+        quantity: document.getElementById('quantity').value,
+        price: document.getElementById('price').value,
+        validityDate: document.getElementById('validityDate').value
+      };
+      
+      // Validation basique
+      if (!formData.recipient || !formData.quantity || !formData.price) {
+        alert('Veuillez remplir tous les champs obligatoires');
+        return;
+      }
+      
+      // Ici, vous pouvez envoyer les données à votre serveur
+      console.log('Ordre soumis:', formData);
+      
+      // Afficher un message de confirmation
+      alert(`Ordre d'${currentOrderType === 'buy' ? 'achat' : 'vente'} confirmé pour ${formData.quantity} actions SEMC au prix de ${formData.price} FCFA`);
+      
+      // Fermer le modal
+      closeModal();
+      
+      // Réinitialiser le formulaire
+      orderForm.reset();
+    });
+    
+    // Mettre à jour automatiquement le prix lorsque le prix actuel change
+    const priceInput = document.getElementById('price');
+    const currentPriceElement = document.getElementById('current-price');
+    
+    // Observer les changements de prix (pour les mises à jour en temps réel)
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'childList' || mutation.type === 'characterData') {
+          priceInput.value = currentPriceElement.textContent;
+        }
+      });
+    });
+    
+    observer.observe(currentPriceElement, {
+      childList: true,
+      characterData: true,
+      subtree: true
+    });
+  }
+  
+  // Mise à jour automatique des données
+  function startAutoUpdate() {
+    if (updateInterval) {
+      clearInterval(updateInterval);
+    }
+    updateInterval = setInterval(updateChartData, 2000);
+  }
+  
+  function stopAutoUpdate() {
+    if (updateInterval) {
+      clearInterval(updateInterval);
+      updateInterval = null;
+    }
+  }
+  
+  function updateChartData() {
+    if (!isPlaying) return;
+    
+    // Mettre à jour uniquement si la période actuelle est dynamique
+    if (!timeframeData[currentTimeframe].dynamic) return;
+    
+    // Générer une nouvelle valeur aléatoire
+    const data = timeframeData[currentTimeframe].data;
+    const lastValue = data[data.length - 1];
+    const change = (Math.random() - 0.5) * 10;
+    const newValue = Math.max(700, Math.min(780, lastValue + change));
+    
+    // Mettre à jour les données
+    data.push(newValue);
+    data.shift();
+    
+    // Mettre à jour les labels pour 1H
+    if (currentTimeframe === '1h') {
+      const now = new Date();
+      const timeString = now.getHours().toString().padStart(2, '0') + ':' + 
+                        now.getMinutes().toString().padStart(2, '0');
+      timeframeData['1h'].labels.push(timeString);
+      timeframeData['1h'].labels.shift();
+    }
+    
+    // Mettre à jour le graphique
+    chart.data.labels = timeframeData[currentTimeframe].labels;
+    chart.data.datasets[0].data = timeframeData[currentTimeframe].data;
+    chart.update('active');
+    
+    // Mettre à jour le prix actuel dans l'en-tête
+    updateCurrentPrice(newValue);
+  }
+  
+  function updateCurrentPrice(newPrice) {
+    const priceElement = document.getElementById('current-price');
+    priceElement.textContent = newPrice.toFixed(0);
+    priceElement.classList.add('price-update');
+    setTimeout(() => {
+      priceElement.classList.remove('price-update');
+    }, 1000);
+    
+    // Mettre à jour les autres données
+    updateMarketData(newPrice);
+  }
+  
+  function updateMarketData(newPrice) {
+    // Mettre à jour l'écart de prix
+    const highestSeller = newPrice + 26;
+    const lowestBuyer = newPrice - 5;
+    const gap = highestSeller - lowestBuyer;
+    document.getElementById('price-gap').textContent = gap;
+    
+    // Mettre à jour la variation quotidienne
+    const dailyChange = ((newPrice - 710) / 710 * 100).toFixed(2);
+    const changeElement = document.getElementById('daily-change');
+    changeElement.textContent = (dailyChange >= 0 ? '+' : '') + dailyChange + '%';
+    changeElement.className = 'stat-value ' + (dailyChange >= 0 ? 'positive' : 'negative');
+    
+    // Mettre à jour les hauts et bas
+    const data = timeframeData[currentTimeframe].data;
+    const dailyHigh = Math.max(...data);
+    const dailyLow = Math.min(...data);
+    document.getElementById('daily-high').textContent = dailyHigh.toFixed(0);
+    document.getElementById('daily-low').textContent = dailyLow.toFixed(0);
+    
+    // Mettre à jour le volume (aléatoire)
+    const volume = (Math.random() * 1000 + 2000).toFixed(0);
+    document.getElementById('daily-volume').textContent = volume;
+    
+    // Ajouter une nouvelle transaction à l'historique
+    const now = new Date();
+    const timeString = now.getHours().toString().padStart(2, '0') + ':' + 
+                      now.getMinutes().toString().padStart(2, '0') + ':' + 
+                      now.getSeconds().toString().padStart(2, '0');
+    
+    const historyTable = document.getElementById('transaction-history');
+    const newRow = historyTable.insertRow(1);
+    newRow.innerHTML = `<td>${newPrice.toFixed(0)}</td><td>${timeString}</td><td>${Math.floor(Math.random() * 50) + 1}</td>`;
+    
+    // Limiter à 5 lignes d'historique
+    if (historyTable.rows.length > 6) {
+      historyTable.deleteRow(5);
+    }
+  }
+
+  // Fonction pour changer la période du graphique
+  function changeTimeframe(timeframe) {
+    // Mettre à jour la période courante
+    currentTimeframe = timeframe;
+    
+    // Mettre à jour l'état du bouton Play/Pause
+    if (timeframe === '1h') {
+      document.getElementById('play-pause-btn').style.display = 'block';
+      if (isPlaying) {
+        startAutoUpdate();
+      }
+    } else {
+      document.getElementById('play-pause-btn').style.display = 'none';
+      stopAutoUpdate();
+    }
+    
+    // Mettre à jour les données du graphique
+    chart.data.labels = timeframeData[timeframe].labels;
+    chart.data.datasets[0].data = timeframeData[timeframe].data;
+    chart.update('active');
+    
+    // Mettre à jour le titre du graphique
+    const titleMap = {
+      '1h': '1H - SEMC',
+      '4h': '4H - SEMC',
+      '1d': '1J - SEMC',
+      '1w': '1S - SEMC',
+      '1m': '1M - SEMC',
+      'all': 'All - SEMC'
+    };
+    
+    document.getElementById('chart-title').textContent = titleMap[timeframe] || '1H - SEMC';
+    
+    // Mettre à jour les statistiques avec les nouvelles données
+    const currentPrice = timeframeData[timeframe].data[timeframeData[timeframe].data.length - 1];
+    updateMarketData(currentPrice);
+  }
+  
+  // Gestion des boutons de période
+  document.querySelectorAll('.timeframe-btn').forEach(btn => {
+    if (btn.id !== 'play-pause-btn') {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.timeframe-btn').forEach(b => {
+          if (b.id !== 'play-pause-btn') b.classList.remove('active');
+        });
+        this.classList.add('active');
+        
+        const timeframe = this.getAttribute('data-timeframe');
+        changeTimeframe(timeframe);
+      });
+    }
+  });
+  
+  // Gestion du bouton Play/Pause
+  document.getElementById('play-pause-btn').addEventListener('click', function() {
+    isPlaying = !isPlaying;
+    if (isPlaying) {
+      this.innerHTML = '⏸️ Pause';
+      startAutoUpdate();
+    } else {
+      this.innerHTML = '▶️ Lecture';
+      stopAutoUpdate();
+    }
+  });
+  
+  // Fonctionnalité de recherche dynamique
+  document.getElementById('stockSearch').addEventListener('input', function() {
+    const searchText = this.value.toUpperCase();
+    const rows = document.querySelectorAll('#stocksTable tr');
+    
+    for (let i = 1; i < rows.length; i++) {
+      const symbol = rows[i].querySelector('.stock-symbol').textContent.toUpperCase();
+      if (symbol.includes(searchText)) {
+        rows[i].style.display = '';
+      } else {
+        rows[i].style.display = 'none';
+      }
+    }
+  });
+  
+  // Animation pour les boutons d'achat/vente
+  document.querySelectorAll('.btn-buy, .btn-sell').forEach(button => {
+    button.addEventListener('click', function() {
+      this.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        this.style.transform = '';
+      }, 200);
+    });
+  });
+  
+  // Fonction de déconnexion
+  function deconnexion() {
+    if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+      updateUIAfterLogout();
+      alert('Déconnexion réussie.');
+      closeProfileModal();
+    }
+  }
+  
+  // Initialisation au chargement de la page
+  document.addEventListener('DOMContentLoaded', function() {
+    initChart();
+    initAuth(); // Initialiser l'authentification
+  });
+</script>
+
+</body>
+</html>

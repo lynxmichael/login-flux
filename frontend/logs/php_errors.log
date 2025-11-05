@@ -1,0 +1,80 @@
+[20-Oct-2025 14:09:23 Europe/Berlin] PHP Warning:  Undefined variable $pdo in C:\xampp\htdocs\projet-bourse\frontend\php\auth.php on line 76
+[20-Oct-2025 14:09:23 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in C:\xampp\htdocs\projet-bourse\frontend\php\auth.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\projet-bourse\frontend\php\auth.php on line 76
+[20-Oct-2025 14:09:23 Europe/Berlin] PHP Warning:  Undefined variable $pdo in C:\xampp\htdocs\projet-bourse\frontend\php\auth.php on line 76
+[20-Oct-2025 14:09:23 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in C:\xampp\htdocs\projet-bourse\frontend\php\auth.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\projet-bourse\frontend\php\auth.php on line 76
+[20-Oct-2025 14:09:34 Europe/Berlin] PHP Warning:  Undefined variable $pdo in C:\xampp\htdocs\projet-bourse\frontend\php\auth.php on line 76
+[20-Oct-2025 14:09:34 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in C:\xampp\htdocs\projet-bourse\frontend\php\auth.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\projet-bourse\frontend\php\auth.php on line 76
+[20-Oct-2025 14:09:34 Europe/Berlin] PHP Warning:  Undefined variable $pdo in C:\xampp\htdocs\projet-bourse\frontend\php\auth.php on line 76
+[20-Oct-2025 14:09:34 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in C:\xampp\htdocs\projet-bourse\frontend\php\auth.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\projet-bourse\frontend\php\auth.php on line 76
+[20-Oct-2025 14:33:36 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to private Database::__construct() from scope UserController in C:\xampp\htdocs\projet-bourse\frontend\php\user.php:15
+Stack trace:
+#0 C:\xampp\htdocs\projet-bourse\frontend\php\user.php(264): UserController->__construct()
+#1 C:\xampp\htdocs\projet-bourse\frontend\php\auth.php(3): require_once('C:\\xampp\\htdocs...')
+#2 {main}
+  thrown in C:\xampp\htdocs\projet-bourse\frontend\php\user.php on line 15
+[20-Oct-2025 14:33:36 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to private Database::__construct() from scope UserController in C:\xampp\htdocs\projet-bourse\frontend\php\user.php:15
+Stack trace:
+#0 C:\xampp\htdocs\projet-bourse\frontend\php\user.php(264): UserController->__construct()
+#1 C:\xampp\htdocs\projet-bourse\frontend\php\auth.php(3): require_once('C:\\xampp\\htdocs...')
+#2 {main}
+  thrown in C:\xampp\htdocs\projet-bourse\frontend\php\user.php on line 15
+[20-Oct-2025 14:39:30 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to private Database::__construct() from scope UserController in C:\xampp\htdocs\projet-bourse\frontend\php\user.php:15
+Stack trace:
+#0 C:\xampp\htdocs\projet-bourse\frontend\php\user.php(264): UserController->__construct()
+#1 C:\xampp\htdocs\projet-bourse\frontend\php\auth.php(3): require_once('C:\\xampp\\htdocs...')
+#2 {main}
+  thrown in C:\xampp\htdocs\projet-bourse\frontend\php\user.php on line 15
+[20-Oct-2025 14:39:30 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to private Database::__construct() from scope UserController in C:\xampp\htdocs\projet-bourse\frontend\php\user.php:15
+Stack trace:
+#0 C:\xampp\htdocs\projet-bourse\frontend\php\user.php(264): UserController->__construct()
+#1 C:\xampp\htdocs\projet-bourse\frontend\php\auth.php(3): require_once('C:\\xampp\\htdocs...')
+#2 {main}
+  thrown in C:\xampp\htdocs\projet-bourse\frontend\php\user.php on line 15
+[20-Oct-2025 15:31:09 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to private Database::__construct() from scope UserController in C:\xampp\htdocs\projet-bourse\frontend\php\user.php:15
+Stack trace:
+#0 C:\xampp\htdocs\projet-bourse\frontend\php\user.php(264): UserController->__construct()
+#1 C:\xampp\htdocs\projet-bourse\frontend\php\auth.php(3): require_once('C:\\xampp\\htdocs...')
+#2 {main}
+  thrown in C:\xampp\htdocs\projet-bourse\frontend\php\user.php on line 15
+[20-Oct-2025 15:31:09 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to private Database::__construct() from scope UserController in C:\xampp\htdocs\projet-bourse\frontend\php\user.php:15
+Stack trace:
+#0 C:\xampp\htdocs\projet-bourse\frontend\php\user.php(264): UserController->__construct()
+#1 C:\xampp\htdocs\projet-bourse\frontend\php\auth.php(3): require_once('C:\\xampp\\htdocs...')
+#2 {main}
+  thrown in C:\xampp\htdocs\projet-bourse\frontend\php\user.php on line 15
+[20-Oct-2025 15:41:32 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to private Database::__construct() from scope UserController in C:\xampp\htdocs\projet-bourse\frontend\php\user.php:15
+Stack trace:
+#0 C:\xampp\htdocs\projet-bourse\frontend\php\user.php(264): UserController->__construct()
+#1 C:\xampp\htdocs\projet-bourse\frontend\php\auth.php(3): require_once('C:\\xampp\\htdocs...')
+#2 {main}
+  thrown in C:\xampp\htdocs\projet-bourse\frontend\php\user.php on line 15
+[20-Oct-2025 15:41:32 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to private Database::__construct() from scope UserController in C:\xampp\htdocs\projet-bourse\frontend\php\user.php:15
+Stack trace:
+#0 C:\xampp\htdocs\projet-bourse\frontend\php\user.php(264): UserController->__construct()
+#1 C:\xampp\htdocs\projet-bourse\frontend\php\auth.php(3): require_once('C:\\xampp\\htdocs...')
+#2 {main}
+  thrown in C:\xampp\htdocs\projet-bourse\frontend\php\user.php on line 15
+[20-Oct-2025 15:42:32 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to private Database::__construct() from scope UserController in C:\xampp\htdocs\projet-bourse\frontend\php\user.php:15
+Stack trace:
+#0 C:\xampp\htdocs\projet-bourse\frontend\php\user.php(264): UserController->__construct()
+#1 C:\xampp\htdocs\projet-bourse\frontend\php\auth.php(3): require_once('C:\\xampp\\htdocs...')
+#2 {main}
+  thrown in C:\xampp\htdocs\projet-bourse\frontend\php\user.php on line 15
+[20-Oct-2025 15:42:32 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to private Database::__construct() from scope UserController in C:\xampp\htdocs\projet-bourse\frontend\php\user.php:15
+Stack trace:
+#0 C:\xampp\htdocs\projet-bourse\frontend\php\user.php(264): UserController->__construct()
+#1 C:\xampp\htdocs\projet-bourse\frontend\php\auth.php(3): require_once('C:\\xampp\\htdocs...')
+#2 {main}
+  thrown in C:\xampp\htdocs\projet-bourse\frontend\php\user.php on line 15
